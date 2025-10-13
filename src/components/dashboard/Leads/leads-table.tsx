@@ -99,12 +99,12 @@ export function LeadsTable({
 
 	return (
 		<Card>
-			<TableContainer
-				component={Paper}
-				sx={{
-					maxHeight: "50vh", // Set your desired height here
-					overflow: "auto",
-				}}
+				<TableContainer
+					component={Paper}
+					sx={{
+						maxHeight: '75vh', // increased height to show more rows
+						overflow: 'auto',
+					}}
 			>
 				<Table sx={{ minWidth: "800px" }} stickyHeader>
 					<TableHead>

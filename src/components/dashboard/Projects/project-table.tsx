@@ -157,7 +157,7 @@ export function ProjectTable({
   }, []);
   return (
     <Card>
-      <Box sx={{ overflowX: 'auto' }}>
+      <Box sx={{ overflowX: 'auto', maxHeight: '75vh', overflowY: 'auto' }}>
         <Table sx={{ minWidth: '800px' }}>
           <TableHead>
             <TableRow >
