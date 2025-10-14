@@ -10,12 +10,14 @@ import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Link from "@mui/material/Link";
 import { EyeIcon, EyeSlashIcon } from "@phosphor-icons/react";
 import { Controller, useForm } from "react-hook-form";
 import { z as zod } from "zod";
 
 import { authClient } from "@/lib/auth/client";
-import { useUser } from "@/hooks/use-user";
+import { paths } from "@/paths";
 
 // Separate schemas for email and password (optional)
 const schemaEmail = zod.object({
@@ -41,11 +43,12 @@ export function SecureForgotPasswordForm() {
 	const tokenFromUrl = searchParams.get("token") || "";
 	const [view, setView] = React.useState<"email" | "password">(tokenFromUrl ? "password" : "email");
 	const [showPassword, setShowPassword] = React.useState(false);
+
 	React.useEffect(() => {
 		const handleStorage = (e: StorageEvent) => {
 			if (e.key === "passwordResetSuccess" && e.newValue === "true") {
 				localStorage.removeItem("passwordResetSuccess");
-				router.push("/auth/sign-in"); // optional: redirect automatically
+				router.push("/auth/sign-in");
 			}
 		};
 
@@ -108,7 +111,7 @@ export function SecureForgotPasswordForm() {
 					localStorage.setItem("passwordResetSuccess", "true");
 					setSuccess("Password reset successfully.");
 					router.push("/auth/sign-in");
-                    localStorage.removeItem("passwordResetSuccess");
+					localStorage.removeItem("passwordResetSuccess");
 				}
 			}
 		} catch {
@@ -119,19 +122,55 @@ export function SecureForgotPasswordForm() {
 	};
 
 	return (
-		<Stack spacing={3} maxWidth={400} margin="auto" mt={5}>
-			<Typography variant="h4">{view === "email" ? "Forgot Password" : "Reset Password"}</Typography>
+		<Box sx={{ width: '100%', maxWidth: '400px', mx: 'auto', mt: 4 }}>
+			{/* Header Section */}
+			<Box sx={{ mb: 4 }}>
+				<Typography
+					variant="h1"
+					sx={{
+						fontWeight: 600,
+						mb: 1,
+						color: 'text.primary',
+						fontSize: '1.5rem',
+						'@media (min-width: 640px)': {
+							fontSize: '1.875rem'
+						}
+					}}
+				>
+					{view === "email" ? "Forgot Your Password?" : "Reset Your Password"}
+				</Typography>
+				<Typography
+					variant="body1"
+					sx={{
+						color: 'text.secondary',
+						fontSize: '0.875rem',
+						lineHeight: 1.5
+					}}
+				>
+					{view === "email"
+						? "Enter the email address linked to your account, and we'll send you a link to reset your password."
+						: "Enter your new password below to reset your account password."
+					}
+				</Typography>
+			</Box>
+
 			<form onSubmit={handleSubmit(onSubmit)}>
-				<Stack spacing={2}>
+				<Stack spacing={3}>
 					{view === "email" ? (
 						<Controller
 							name="email"
 							control={control}
 							render={({ field }) => (
-								<FormControl error={Boolean(errors.email)}>
-									<InputLabel>Email</InputLabel>
-									<OutlinedInput {...field} type="email" label="Email" />
-									{errors.email && <FormHelperText>{errors.email?.message?.toString()}</FormHelperText>}
+								<FormControl error={Boolean(errors.email)} variant="outlined" size="small">
+									<InputLabel sx={{ fontSize: '0.875rem' }}>Email *</InputLabel>
+									<OutlinedInput
+										{...field}
+										type="email"
+										label="Email *"
+										placeholder="Enter your email"
+										sx={{ fontSize: '0.875rem' }}
+									/>
+									{errors.email && <FormHelperText sx={{ fontSize: '0.75rem', mx: 0 }}>{errors.email?.message?.toString()}</FormHelperText>}
 								</FormControl>
 							)}
 						/>
@@ -141,29 +180,38 @@ export function SecureForgotPasswordForm() {
 								name="password"
 								control={control}
 								render={({ field }) => (
-									<FormControl error={Boolean(errors.password)}>
-										<InputLabel>New Password</InputLabel>
+									<FormControl error={Boolean(errors.password)} variant="outlined" size="small">
+										<InputLabel sx={{ fontSize: '0.875rem' }}>New Password *</InputLabel>
 										<OutlinedInput
 											{...field}
 											type={showPassword ? "text" : "password"}
-											label="New Password"
+											label="New Password *"
+											placeholder="Enter your new password"
+											sx={{ fontSize: '0.875rem' }}
 											endAdornment={
-												showPassword ? (
-													<EyeIcon
-														cursor="pointer"
-														onClick={() => setShowPassword(false)}
-														fontSize="var(--icon-fontSize-md)"
-													/>
-												) : (
-													<EyeSlashIcon
-														cursor="pointer"
-														onClick={() => setShowPassword(true)}
-														fontSize="var(--icon-fontSize-md)"
-													/>
-												)
+												<Box
+													component="button"
+													type="button"
+													onClick={() => setShowPassword(!showPassword)}
+													sx={{
+														background: 'none',
+														border: 'none',
+														cursor: 'pointer',
+														display: 'flex',
+														alignItems: 'center',
+														color: 'text.secondary',
+														'&:hover': { color: 'text.primary' }
+													}}
+												>
+													{showPassword ? (
+														<EyeSlashIcon fontSize="16" />
+													) : (
+														<EyeIcon fontSize="16" />
+													)}
+												</Box>
 											}
 										/>
-										{errors.password && <FormHelperText>{errors.password?.message?.toString()}</FormHelperText>}
+										{errors.password && <FormHelperText sx={{ fontSize: '0.75rem', mx: 0 }}>{errors.password?.message?.toString()}</FormHelperText>}
 									</FormControl>
 								)}
 							/>
@@ -171,11 +219,17 @@ export function SecureForgotPasswordForm() {
 								name="confirmPassword"
 								control={control}
 								render={({ field }) => (
-									<FormControl error={Boolean(errors.confirmPassword)}>
-										<InputLabel>Confirm Password</InputLabel>
-										<OutlinedInput {...field} type="password" label="Confirm Password" />
+									<FormControl error={Boolean(errors.confirmPassword)} variant="outlined" size="small">
+										<InputLabel sx={{ fontSize: '0.875rem' }}>Confirm Password *</InputLabel>
+										<OutlinedInput
+											{...field}
+											type="password"
+											label="Confirm Password *"
+											placeholder="Confirm your new password"
+											sx={{ fontSize: '0.875rem' }}
+										/>
 										{errors.confirmPassword && (
-											<FormHelperText>{errors.confirmPassword?.message?.toString()}</FormHelperText>
+											<FormHelperText sx={{ fontSize: '0.75rem', mx: 0 }}>{errors.confirmPassword?.message?.toString()}</FormHelperText>
 										)}
 									</FormControl>
 								)}
@@ -183,14 +237,61 @@ export function SecureForgotPasswordForm() {
 						</>
 					)}
 
-					{error && <Alert severity="error">{error}</Alert>}
-					{success && <Alert severity="success">{success}</Alert>}
+					{error && <Alert severity="error" sx={{ fontSize: '0.875rem' }}>{error}</Alert>}
+					{success && <Alert severity="success" sx={{ fontSize: '0.875rem' }}>{success}</Alert>}
 
-					<Button type="submit" disabled={isPending} variant="contained" sx={{ backgroundColor: "#0fb9d8" }}>
-						{view === "email" ? "Send Reset Link" : "Reset Password"}
+					{/* Divider */}
+					<Box sx={{ borderTop: 1, borderColor: 'grey.200', my: 1 }} />
+
+					{/* Send Reset Link Button */}
+					<Button
+						type="submit"
+						disabled={isPending}
+						variant="contained"
+						sx={{
+							py: 1.5,
+							backgroundColor: '#465FFF',
+							fontWeight: 600,
+							fontSize: '0.875rem',
+							textTransform: 'none',
+							'&:hover': {
+								backgroundColor: '#2f47d1',
+							},
+							'&.Mui-disabled': {
+								backgroundColor: 'grey.400',
+							}
+						}}
+					>
+						{view === "email" ? (isPending ? 'Sending...' : 'Send Reset Link') : (isPending ? 'Resetting...' : 'Reset Password')}
 					</Button>
+
+					{/* Remember Password Link - Only show on email view */}
+					{view === "email" && (
+						<Box sx={{ textAlign: 'center', mt: 2 }}>
+							<Typography sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+								Wait, I remember my password...{" "}
+								<Link
+									component="button"
+									type="button"
+									onClick={() => router.push(paths.auth.signIn)}
+									sx={{
+										color: '#465FFF',
+										fontWeight: 600,
+										textDecoration: 'none',
+										background: 'none',
+										border: 'none',
+										cursor: 'pointer',
+										fontSize: '0.875rem',
+										'&:hover': { color: '#2f47d1' }
+									}}
+								>
+									Click here
+								</Link>
+							</Typography>
+						</Box>
+					)}
 				</Stack>
 			</form>
-		</Stack>
+		</Box>
 	);
 }
