@@ -21,6 +21,8 @@ import { z as zod } from "zod";
 import { paths } from "@/paths";
 import { authClient } from "@/lib/auth/client";
 import { useUser } from "@/hooks/use-user";
+import { auth, googleProvider } from '@/lib/firebase';
+import { signInWithPopup } from 'firebase/auth';
 
 const schema = zod.object({
   username: zod.string().min(1, { message: "Username is required" }),
@@ -150,6 +152,34 @@ export function SignUpForm(): React.JSX.Element {
 
   return (
     <Stack spacing={3}>
+      <Button
+        onClick={async () => {
+          setError(null);
+          setIsPending(true);
+          try {
+            const result = await signInWithPopup(auth, googleProvider);
+            const token = await result.user.getIdToken();
+
+            localStorage.setItem('auth-token', token);
+            localStorage.setItem('user', JSON.stringify({
+              id: result.user.uid,
+              name: result.user.displayName,
+              email: result.user.email,
+            }));
+
+            await checkSession?.();
+            router.refresh();
+          } catch (err: any) {
+            setError(err?.message || String(err));
+          } finally {
+            setIsPending(false);
+          }
+        }}
+        variant="outlined"
+        sx={{ borderColor: '#0fb9d8', color: '#0fb9d8' }}
+      >
+        {isPending ? 'Starting...' : 'Sign up with Google'}
+      </Button>
       {!otpSent ? (
         <>
           <Stack spacing={1}>

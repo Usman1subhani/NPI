@@ -21,6 +21,8 @@ import { z as zod } from 'zod';
 import { paths } from '@/paths';
 import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
+import { auth, googleProvider } from '@/lib/firebase';
+import { signInWithPopup } from 'firebase/auth';
 
 const schema = zod.object({
   email: zod.string().min(1, { message: 'Email is required' }).email(),
@@ -46,6 +48,8 @@ export function SignInForm(): React.JSX.Element {
     setError,
     formState: { errors },
   } = useForm<Values>({ defaultValues, resolver: zodResolver(schema) });
+
+  const [googleError, setGoogleError] = React.useState<string | null>(null);
 
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
@@ -73,7 +77,7 @@ export function SignInForm(): React.JSX.Element {
     <Stack spacing={4}>
       <Stack spacing={1}>
         <Typography variant="h4">Sign in</Typography>
-       
+
       </Stack>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
@@ -122,16 +126,54 @@ export function SignInForm(): React.JSX.Element {
               </FormControl>
             )}
           />
-          <Typography sx={{color:'#0fb9d8',cursor:'pointer'}} variant="body2"  onClick={() => router.push(paths.auth.forgotPassword)}>
+          <Typography sx={{ color: '#0fb9d8', cursor: 'pointer' }} variant="body2" onClick={() => router.push(paths.auth.forgotPassword)}>
             Forget Password?
           </Typography>
           {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
-          <Button disabled={isPending} type="submit" sx={{backgroundColor:'#0fb9d8'}}  variant="contained">
+          <Button disabled={isPending} type="submit" sx={{ backgroundColor: '#0fb9d8' }} variant="contained">
             Sign in
           </Button>
+          <Typography>
+            Don't have an account?{' '}
+            <Link component={RouterLink} href={'/auth/sign-up'} underline="hover" variant="subtitle2">
+              Sign up
+            </Link>
+          </Typography>
         </Stack>
       </form>
-     
+      <Button
+        onClick={async () => {
+          setGoogleError(null);
+          setIsPending(true);
+          try {
+            const result = await signInWithPopup(auth, googleProvider);
+            const credential = (result as any).user;
+            const token = await result.user.getIdToken();
+
+            // Store token and user in localStorage similar to authClient
+            localStorage.setItem('auth-token', token);
+            localStorage.setItem('user', JSON.stringify({
+              id: result.user.uid,
+              name: result.user.displayName,
+              email: result.user.email,
+            }));
+
+            // Refresh auth state
+            await checkSession?.();
+            router.refresh();
+          } catch (err: any) {
+            setGoogleError(err?.message || String(err));
+          } finally {
+            setIsPending(false);
+          }
+        }}
+        variant="outlined"
+        sx={{ borderColor: '#0fb9d8', color: '#0fb9d8' }}
+      >
+        {isPending ? 'Starting...' : 'Sign in with Google'}
+      </Button>
+      {googleError ? <Alert color="error">{googleError}</Alert> : null}
+
     </Stack>
   );
 }
