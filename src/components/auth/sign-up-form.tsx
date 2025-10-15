@@ -287,7 +287,7 @@ export function SignUpForm(): React.JSX.Element {
                 control={control}
                 name="username"
                 render={({ field }) => (
-                  <FormControl error={Boolean(errors.username)} variant="outlined" size="small">
+                  <FormControl error={Boolean(errors.username)} variant="outlined" size="medium">
                     <InputLabel sx={{ fontSize: '0.875rem' }}>Username *</InputLabel>
                     <OutlinedInput
                       {...field}
@@ -304,7 +304,7 @@ export function SignUpForm(): React.JSX.Element {
                 control={control}
                 name="phone"
                 render={({ field }) => (
-                  <FormControl error={Boolean(errors.phone)} variant="outlined" size="small">
+                  <FormControl error={Boolean(errors.phone)} variant="outlined" size="medium">
                     <InputLabel sx={{ fontSize: '0.875rem' }}>Phone *</InputLabel>
                     <OutlinedInput
                       {...field}
@@ -324,7 +324,7 @@ export function SignUpForm(): React.JSX.Element {
               control={control}
               name="email"
               render={({ field }) => (
-                <FormControl error={Boolean(errors.email)} variant="outlined" size="small">
+                <FormControl error={Boolean(errors.email)} variant="outlined" size="medium">
                   <InputLabel sx={{ fontSize: '0.875rem' }}>Email *</InputLabel>
                   <OutlinedInput
                     {...field}
@@ -343,7 +343,7 @@ export function SignUpForm(): React.JSX.Element {
               control={control}
               name="password"
               render={({ field }) => (
-                <FormControl error={Boolean(errors.password)} variant="outlined" size="small">
+                <FormControl error={Boolean(errors.password)} variant="outlined" size="medium">
                   <InputLabel sx={{ fontSize: '0.875rem' }}>Password *</InputLabel>
                   <OutlinedInput
                     {...field}
