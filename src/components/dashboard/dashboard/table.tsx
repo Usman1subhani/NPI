@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Box, Tooltip } from "@mui/material";
+import { Box, Tooltip, TextField, Button, IconButton, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 import Card from "@mui/material/Card";
 // import Checkbox from '@mui/material/Checkbox';
 import Divider from "@mui/material/Divider";
@@ -20,7 +20,11 @@ import Typography from "@mui/material/Typography";
 // import Avatar from '@mui/material/Avatar';
 // import Box from '@mui/material/Box';
 // import CircularProgress from '@mui/material/CircularProgress';
-import { FaFacebook, FaInstagram, FaLinkedin, FaRegStar, FaStar, FaStarHalfAlt, FaYoutube } from "react-icons/fa"; // at the top
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+// import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 // import dayjs from 'dayjs';
 // import { useSelection } from '@/hooks/use-selection';
@@ -66,100 +70,149 @@ export function DashboardTable({
 	rowsPerPageOptions = [10, 25, 50, 100],
 	loading = false,
 }: DashboardTableProps): React.JSX.Element {
-	//   const rowIds = React.useMemo(() => {
-	//     return rows.map((customer) => customer.id);
-	//   }, [rows]);
+	// Unique values for filters
+	const states = React.useMemo(() => Array.from(new Set(rows.map(r => r.state).filter(Boolean))), [rows]);
+	const cities = React.useMemo(() => Array.from(new Set(rows.map(r => r.city).filter(Boolean))), [rows]);
+	const orgs = React.useMemo(() => Array.from(new Set(rows.map(r => r.orgName).filter(Boolean))), [rows]);
 
-	let index = 1;
+	// Filter state
+	const [searchTerm, setSearchTerm] = React.useState("");
+	const [selectedDate, setSelectedDate] = React.useState<dayjs.Dayjs | null>(null);
+	const [stateFilter, setStateFilter] = React.useState("");
+	const [cityFilter, setCityFilter] = React.useState("");
+	const [orgFilter, setOrgFilter] = React.useState("");
+
+	// Filter rows
+	const filteredRows = React.useMemo(() => {
+		return rows.filter(row => {
+			const searchLower = searchTerm.toLowerCase();
+			const firstNameMatch = row.firstName?.toLowerCase().includes(searchLower);
+			const lastNameMatch = row.lastName?.toLowerCase().includes(searchLower);
+			const stateMatch = !stateFilter || row.state === stateFilter;
+			const cityMatch = !cityFilter || row.city === cityFilter;
+			const orgMatch = !orgFilter || row.orgName === orgFilter;
+			// Date filter: filter by createdAt
+			const dateMatch = !selectedDate || (row.createdAt && dayjs(row.createdAt).isSame(selectedDate, 'day'));
+			return (!searchTerm || firstNameMatch || lastNameMatch) && stateMatch && cityMatch && orgMatch && dateMatch;
+		});
+	}, [rows, searchTerm, stateFilter, cityFilter, orgFilter, selectedDate]);
+
+	// Export CSV
+	const handleExport = () => {
+		// TODO: Implement CSV export logic
+		console.log("Export to CSV clicked");
+	};
 
 	return (
-		<Card>
+		<Box sx={{ transform: 'scale(1)', transformOrigin: 'top left', width: '100%' }}>
+			<Card sx={{ width: '100%' }}>
 				<TableContainer
 					component={Paper}
 					sx={{
-						maxHeight: '75vh', // increased height to show more rows
+						maxHeight: '160vh', // smaller height
+						maxWidth: '100%',
 						overflow: 'auto',
+						boxShadow: 'none',
 					}}
-			>
-				<Table sx={{ minWidth: "800px" }} stickyHeader>
-					<TableHead  >
-						<TableRow >
-							<TableCell sx={{ backgroundColor: "#0fb9d8 !important", color: "white !important", fontSize: "16px", fontWeight: "bold" }}>#</TableCell>
-							<TableCell sx={{backgroundColor: "#0fb9d8 !important", color: "white !important", fontSize: "16px", fontWeight: "bold" }}>NPI</TableCell>
-							<TableCell sx={{ backgroundColor: "#0fb9d8 !important",color: "white !important", fontSize: "16px", fontWeight: "bold",whiteSpace: "nowrap" }}>Enumeration Type</TableCell>
-							<TableCell sx={{ backgroundColor: "#0fb9d8 !important",color: "white !important", fontSize: "16px", fontWeight: "bold" ,whiteSpace: "nowrap"}}>First Name</TableCell>
-							<TableCell sx={{ backgroundColor: "#0fb9d8 !important",color: "white !important", fontSize: "16px", fontWeight: "bold",whiteSpace: "nowrap" }}>Last Name</TableCell>
-							<TableCell sx={{backgroundColor: "#0fb9d8 !important", color: "white !important", fontSize: "16px", fontWeight: "bold" ,whiteSpace: "nowrap"}}>Organization</TableCell>
-							<TableCell sx={{backgroundColor: "#0fb9d8 !important", color: "white !important", fontSize: "16px", fontWeight: "bold" }}>City</TableCell>
-							<TableCell sx={{backgroundColor: "#0fb9d8 !important", color: "white !important", fontSize: "16px", fontWeight: "bold" }}>State</TableCell>
-							<TableCell sx={{backgroundColor: "#0fb9d8 !important", color: "white !important", fontSize: "16px", fontWeight: "bold" ,whiteSpace: "nowrap"}}>Postal Code</TableCell>
-							<TableCell sx={{ backgroundColor: "#0fb9d8 !important",color: "white !important", fontSize: "16px", fontWeight: "bold" }}>Phone</TableCell>
-							<TableCell sx={{backgroundColor: "#0fb9d8 !important", color: "white !important", fontSize: "16px", fontWeight: "bold" }}>Taxonomy</TableCell>
-							<TableCell sx={{backgroundColor: "#0fb9d8 !important", color: "white !important", fontSize: "16px", fontWeight: "bold",whiteSpace: "nowrap" }}>Created At</TableCell>
-							<TableCell sx={{backgroundColor: "#0fb9d8 !important", color: "white !important", fontSize: "16px", fontWeight: "bold",whiteSpace: "nowrap" }}>Updated At</TableCell>
-							<TableCell sx={{backgroundColor: "#0fb9d8 !important", color: "white !important", fontSize: "16px", fontWeight: "bold",whiteSpace: "nowrap" }}>Enumeration Date</TableCell>
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{rows && rows.length > 0 ? (
-							rows.map((row, index) => (
-								<TableRow hover key={row.npi}>
-									<TableCell>{index + 1}</TableCell>
-									<TableCell>{row.npi}</TableCell>
-									<TableCell>{row.enumerationType || "N/A"}</TableCell>
-									<TableCell>{row.firstName || "-"}</TableCell>
-									<TableCell>{row.lastName || "-"}</TableCell>
-									<TableCell>{row.orgName ? (
-											<Tooltip title={row.orgName}>
-												<Typography variant="body2" noWrap sx={{ maxWidth: 200 }}>
-													{row.orgName.length > 50 ? row.orgName.slice(0, 50) + "..." : row.orgName}
-												</Typography>
-											</Tooltip>
-										) : (
-											"No Organization Name"
-										)}</TableCell>
-									<TableCell>{row.city || "-"}</TableCell>
-									<TableCell>{row.state || "-"}</TableCell>
-									<TableCell>{row.postalCode || "-"}</TableCell>
-									<TableCell>{row.phone || "-"}</TableCell>
-									<TableCell>
-										{row.taxonomy ? (
-											<Tooltip title={row.taxonomy}>
-												<Typography variant="body2" noWrap sx={{ maxWidth: 200 }}>
-													{row.taxonomy.length > 50 ? row.taxonomy.slice(0, 50) + "..." : row.taxonomy}
-												</Typography>
-											</Tooltip>
-										) : (
-											"No Taxonomy"
-										)}
-									</TableCell>
-
-									<TableCell>{new Date(row.createdAt ?? "").toLocaleDateString()}</TableCell>
-									<TableCell>{new Date(row.updatedAt ?? "").toLocaleDateString()}</TableCell>
-									<TableCell>{new Date(row.enumerationDate ?? "").toLocaleDateString()}</TableCell>
-								</TableRow>
-							))
-						) : (
+				>
+					<Table sx={{ minWidth: 700 }} stickyHeader>
+						<TableHead>
 							<TableRow>
-								<TableCell colSpan={13} align="center">
-									No data found
-								</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1 }}>#</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1 }}>NPI</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Enumeration Type</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>First Name</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Last Name</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Organization</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1 }}>City</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1 }}>State</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Postal Code</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1 }}>Phone</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1 }}>Taxonomy</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Created At</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Updated At</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Enumeration Date</TableCell>
 							</TableRow>
-						)}
-					</TableBody>
-				</Table>
-			</TableContainer>
-			<Divider />
-
-			<TablePagination
-				component="div"
-				count={count ?? 0}
-				page={page ?? 0}
-				onPageChange={onPageChange}
-				rowsPerPage={rowsPerPage ?? 10}
-				onRowsPerPageChange={onRowsPerPageChange}
-				rowsPerPageOptions={rowsPerPageOptions}
-			/>
-		</Card>
+						</TableHead>
+						<TableBody>
+							{filteredRows && filteredRows.length > 0 ? (
+								filteredRows.map((row, index) => (
+									<TableRow hover key={row.npi} sx={{ fontSize: 13 }}>
+										<TableCell sx={{ fontSize: 13 }}>{index + 1}</TableCell>
+										<TableCell sx={{ fontSize: 13 }}>{row.npi}</TableCell>
+										<TableCell sx={{ fontSize: 13 }}>{row.enumerationType || "N/A"}</TableCell>
+										<TableCell sx={{ fontSize: 13 }}>{row.firstName || "-"}</TableCell>
+										<TableCell sx={{ fontSize: 13 }}>{row.lastName || "-"}</TableCell>
+										<TableCell sx={{ fontSize: 13 }}>
+											{row.orgName ? (
+												<Tooltip title={row.orgName}>
+													<Typography variant="body2" noWrap sx={{ maxWidth: 120, fontSize: 13 }}>
+														{row.orgName.length > 30 ? row.orgName.slice(0, 30) + "..." : row.orgName}
+													</Typography>
+												</Tooltip>
+											) : (
+												"No Organization Name"
+											)}
+										</TableCell>
+										<TableCell sx={{ fontSize: 13 }}>{row.city || "-"}</TableCell>
+										<TableCell sx={{ fontSize: 13 }}>{row.state || "-"}</TableCell>
+										<TableCell sx={{ fontSize: 13 }}>{row.postalCode || "-"}</TableCell>
+										<TableCell sx={{ fontSize: 13 }}>{row.phone || "-"}</TableCell>
+										<TableCell sx={{ fontSize: 13 }}>
+											{row.taxonomy ? (
+												<Tooltip title={row.taxonomy}>
+													<Typography variant="body2" noWrap sx={{ maxWidth: 120, fontSize: 13 }}>
+														{row.taxonomy.length > 30 ? row.taxonomy.slice(0, 30) + "..." : row.taxonomy}
+													</Typography>
+												</Tooltip>
+											) : (
+												"No Taxonomy"
+											)}
+										</TableCell>
+										<TableCell sx={{ fontSize: 13 }}>{new Date(row.createdAt ?? "").toLocaleDateString()}</TableCell>
+										<TableCell sx={{ fontSize: 13 }}>{new Date(row.updatedAt ?? "").toLocaleDateString()}</TableCell>
+										<TableCell sx={{ fontSize: 13 }}>{new Date(row.enumerationDate ?? "").toLocaleDateString()}</TableCell>
+									</TableRow>
+								))
+							) : (
+								<TableRow>
+									<TableCell colSpan={14} align="center" sx={{ fontSize: 13 }}>
+										No data found
+									</TableCell>
+								</TableRow>
+							)}
+						</TableBody>
+					</Table>
+				</TableContainer>
+				<Divider />
+				<Box sx={{ p: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+					<TablePagination
+						component="div"
+						count={filteredRows.length}
+						page={page ?? 0}
+						onPageChange={onPageChange}
+						rowsPerPage={rowsPerPage ?? 10}
+						onRowsPerPageChange={onRowsPerPageChange}
+						rowsPerPageOptions={rowsPerPageOptions}
+						sx={{
+							'.MuiTablePagination-select': {
+								borderRadius: 1,
+								mr: 1,
+								fontSize: 13,
+								color: '#161950',
+							},
+							'.MuiTablePagination-displayedRows': {
+								mr: 2,
+								fontSize: 13,
+								color: '#161950',
+							},
+							'.MuiTablePagination-actions': {
+								color: '#161950',
+							},
+						}}
+					/>
+				</Box>
+			</Card>
+		</Box>
 	);
 }
