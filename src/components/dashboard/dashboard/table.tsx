@@ -16,7 +16,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import Typography from "@mui/material/Typography"; 
+import Typography from "@mui/material/Typography";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -115,65 +115,87 @@ export function DashboardTable({
 					<Table sx={{ minWidth: 700 }} stickyHeader>
 						<TableHead>
 							<TableRow>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1 }}>#</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1 }}>NPI</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Enumeration Type</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>First Name</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Last Name</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Organization</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1 }}>City</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1 }}>State</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Postal Code</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1 }}>Phone</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1 }}>Taxonomy</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Created At</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Updated At</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Enumeration Date</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1 }}>#</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, textAlign: 'center' }}>NPI</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Enumeration Type</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>First Name</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Last Name</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, maxWidth: 150 }}>Organization</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, }}>City</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1 }}>State</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Postal Code</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, minWidth: 120, textAlign: 'center' }}>Phone</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, textAlign: 'center' }}>Taxonomy</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Created At</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Updated At</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Enumeration Date</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
 							{filteredRows && filteredRows.length > 0 ? (
 								filteredRows.map((row, index) => (
-									<TableRow hover key={row.npi} sx={{ fontSize: 13 }}>
-										<TableCell sx={{ fontSize: 13 }}>{index + 1}</TableCell>
-										<TableCell sx={{ fontSize: 13 }}>{row.npi}</TableCell>
-										<TableCell sx={{ fontSize: 13 }}>{row.enumerationType || "N/A"}</TableCell>
-										<TableCell sx={{ fontSize: 13 }}>{row.firstName || "-"}</TableCell>
-										<TableCell sx={{ fontSize: 13 }}>{row.lastName || "-"}</TableCell>
-										<TableCell sx={{ fontSize: 13 }}>
+									<TableRow hover key={row.npi} sx={{ fontSize: 12 }}>
+										<TableCell sx={{ fontSize: 12 }}>{index + 1}</TableCell>
+										<TableCell sx={{ fontSize: 12, }}>{row.npi}</TableCell>
+										<TableCell sx={{ fontSize: 12, textAlign: 'center' }}>{row.enumerationType || "N/A"}</TableCell>
+										<TableCell sx={{ fontSize: 12 }}>{row.firstName || "-"}</TableCell>
+										<TableCell sx={{ fontSize: 12 }}>{row.lastName || "-"}</TableCell>
+										<TableCell sx={{ fontSize: 12 }}>
 											{row.orgName ? (
-												<Tooltip title={row.orgName}>
-													<Typography variant="body2" noWrap sx={{ maxWidth: 120, fontSize: 13 }}>
-														{row.orgName.length > 30 ? row.orgName.slice(0, 30) + "..." : row.orgName}
-													</Typography>
-												</Tooltip>
+												<Typography variant="body2" noWrap sx={{
+													whiteSpace: 'normal',
+													lineHeight: '1.5em',
+													maxHeight: '3em',
+													overflow: 'hidden',
+													display: '-webkit-box',
+													WebkitLineClamp: 2,
+													WebkitBoxOrient: 'vertical',
+												}}>
+													{row.orgName}
+												</Typography>
+
 											) : (
-												"No Organization Name"
+												"Nil"
 											)}
 										</TableCell>
-										<TableCell sx={{ fontSize: 13 }}>{row.city || "-"}</TableCell>
-										<TableCell sx={{ fontSize: 13 }}>{row.state || "-"}</TableCell>
-										<TableCell sx={{ fontSize: 13 }}>{row.postalCode || "-"}</TableCell>
-										<TableCell sx={{ fontSize: 13 }}>{row.phone || "-"}</TableCell>
-										<TableCell sx={{ fontSize: 13 }}>
+										<TableCell sx={{ fontSize: 12 }}>{row.city || "-"}</TableCell>
+										<TableCell sx={{ fontSize: 12 }}>{row.state || "-"}</TableCell>
+										<TableCell sx={{ fontSize: 12 }}>{row.postalCode || "-"}</TableCell>
+										<TableCell sx={{ fontSize: 12 }}>
+											<Typography
+												variant="subtitle2"
+												noWrap
+												sx={{ textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: 120, textAlign: 'center' }}
+											></Typography>
+											{row.phone || "Nil"}
+										</TableCell>
+										<TableCell sx={{ fontSize: 12 }}>
 											{row.taxonomy ? (
 												<Tooltip title={row.taxonomy}>
-													<Typography variant="body2" noWrap sx={{ maxWidth: 120, fontSize: 13 }}>
-														{row.taxonomy.length > 30 ? row.taxonomy.slice(0, 30) + "..." : row.taxonomy}
+													<Typography variant="body2" noWrap sx={{
+														whiteSpace: 'normal',
+														lineHeight: '1.5em',
+														maxHeight: '3em',
+														overflow: 'hidden',
+														display: '-webkit-box',
+														WebkitLineClamp: 2,
+														WebkitBoxOrient: 'vertical',
+													}}>
+														{row.taxonomy}
 													</Typography>
 												</Tooltip>
 											) : (
 												"No Taxonomy"
 											)}
 										</TableCell>
-										<TableCell sx={{ fontSize: 13 }}>{new Date(row.createdAt ?? "").toLocaleDateString()}</TableCell>
-										<TableCell sx={{ fontSize: 13 }}>{new Date(row.updatedAt ?? "").toLocaleDateString()}</TableCell>
-										<TableCell sx={{ fontSize: 13 }}>{new Date(row.enumerationDate ?? "").toLocaleDateString()}</TableCell>
+										<TableCell sx={{ fontSize: 12 }}>{new Date(row.createdAt ?? "").toLocaleDateString()}</TableCell>
+										<TableCell sx={{ fontSize: 12 }}>{new Date(row.updatedAt ?? "").toLocaleDateString()}</TableCell>
+										<TableCell sx={{ fontSize: 12 }}>{new Date(row.enumerationDate ?? "").toLocaleDateString()}</TableCell>
 									</TableRow>
 								))
 							) : (
 								<TableRow>
-									<TableCell colSpan={14} align="center" sx={{ fontSize: 13 }}>
+									<TableCell colSpan={14} align="center" sx={{ fontSize: 12 }}>
 										No data found
 									</TableCell>
 								</TableRow>
@@ -195,12 +217,12 @@ export function DashboardTable({
 							'.MuiTablePagination-select': {
 								borderRadius: 1,
 								mr: 1,
-								fontSize: 13,
+								fontSize: 12,
 								color: '#161950',
 							},
 							'.MuiTablePagination-displayedRows': {
 								mr: 2,
-								fontSize: 13,
+								fontSize: 12,
 								color: '#161950',
 							},
 							'.MuiTablePagination-actions': {
@@ -210,6 +232,6 @@ export function DashboardTable({
 					/>
 				</Box>
 			</Card>
-		</Box>
+		</Box >
 	);
 }

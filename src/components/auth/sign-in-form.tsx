@@ -87,10 +87,12 @@ export function SignInForm(): React.JSX.Element {
 
       // Store token and user in localStorage similar to authClient
       localStorage.setItem('auth-token', token);
+      // Save avatar/photo if available so other components can use it
       localStorage.setItem('user', JSON.stringify({
         id: result.user.uid,
         name: result.user.displayName,
         email: result.user.email,
+        avatar: result.user.photoURL || result.user.providerData?.[0]?.photoURL || null,
       }));
 
       // Refresh auth state

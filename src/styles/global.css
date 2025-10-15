@@ -45,7 +45,7 @@ body {
 .dots-loader span {
   width: 12px;
   height: 12px;
-  background-color: #0fb9d8;
+  background-color: #161950;
   border-radius: 50%;
   animation: dotFlashing 1s infinite linear alternate;
 }

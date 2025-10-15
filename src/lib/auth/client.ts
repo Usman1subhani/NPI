@@ -349,7 +349,8 @@ class AuthClient {
 		return {
 			data: {
 				id: parsedUser.id,
-				avatar: "/assets/avatar.png",
+				// prefer an avatar property if available (from OAuth providers like Google)
+				avatar: parsedUser.avatar || parsedUser.photoURL || parsedUser.picture || null,
 				name: parsedUser.name,
 				email: parsedUser.email,
 			},

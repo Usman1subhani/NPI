@@ -20,6 +20,8 @@ import { isNavItemActive } from "@/lib/is-nav-item-active";
 
 import { navItems } from "./config";
 import { navIcons } from "./nav-icons";
+import { Avatar } from "@mui/material";
+import { useUser } from "@/hooks/use-user";
 
 export function SideNav(): React.JSX.Element {
 	const pathname = usePathname();
@@ -67,10 +69,10 @@ export function SideNav(): React.JSX.Element {
 				>
 					<Box sx={{ flex: "1 1 auto" }}>
 						<Typography color="var(--mui-palette-neutral-400)" variant="body2">
-							 NPPES NPI
+							NPPES NPI
 						</Typography>
 						<Typography color="inherit" variant="subtitle1">
-							 Registry
+							Registry
 						</Typography>
 					</Box>
 				</Box>
@@ -80,11 +82,33 @@ export function SideNav(): React.JSX.Element {
 				{renderNavItems({ pathname, items: navItems })}
 			</Box>
 			<Divider sx={{ borderColor: "var(--mui-palette-neutral-700)" }} />
-			<Stack spacing={2} sx={{ p: "12px" }}></Stack>
+			<Stack spacing={2} sx={{ p: "12px" }}>
+				{/* User area at bottom */}
+				<UserArea />
+			</Stack>
 		</Box>
 	);
 }
 
+function UserArea(): React.JSX.Element {
+	const { user } = useUser();
+
+	const name = user?.name || '';
+	const email = user?.email || '';
+	const initial = name ? name.charAt(0).toUpperCase() : 'U';
+
+	return (
+		<Box sx={{ display: 'flex', alignItems: 'center', gap: 1, pt: 1 }}>
+			<Avatar sx={{ width: 40, height: 40, bgcolor: '#161950' }} src={user?.avatar}>
+				{!user?.avatar ? initial : null}
+			</Avatar>
+			<Box sx={{ overflow: 'hidden' }}>
+				<Typography sx={{ fontSize: 13, fontWeight: 700, color: 'inherit', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: 160 }}>{name || 'Guest'}</Typography>
+				<Typography sx={{ fontSize: 12, color: 'var(--mui-palette-neutral-400)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: 160 }}>{email}</Typography>
+			</Box>
+		</Box>
+	);
+}
 function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pathname: string }): React.JSX.Element {
 	const children = items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
 		const { key, ...item } = curr;
@@ -124,11 +148,11 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title, ite
 				onClick={toggleOpen}
 				{...(href && !hasChildren
 					? {
-							component: external ? "a" : RouterLink,
-							href,
-							target: external ? "_blank" : undefined,
-							rel: external ? "noreferrer" : undefined,
-						}
+						component: external ? "a" : RouterLink,
+						href,
+						target: external ? "_blank" : undefined,
+						rel: external ? "noreferrer" : undefined,
+					}
 					: { role: "button" })}
 				sx={{
 					alignItems: "center",
@@ -147,7 +171,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title, ite
 						color: "var(--NavItem-disabled-color)",
 						cursor: "not-allowed",
 					}),
-					...(active && { bgcolor: "#0fb9d8", color: "var(--NavItem-active-color)" }),
+					...(active && { bgcolor: "#161950", color: "var(--NavItem-active-color)" }),
 				}}
 			>
 				<Box sx={{ alignItems: "center", display: "flex", justifyContent: "center", flex: "0 0 auto" }}>

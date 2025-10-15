@@ -155,7 +155,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title, ite
             color: 'var(--NavItem-disabled-color)',
             cursor: 'not-allowed',
           }),
-          ...(active && { bgcolor: "#0fb9d8", color: 'var(--NavItem-active-color)' }),
+          ...(active && { bgcolor: "#161950", color: 'var(--NavItem-active-color)' }),
         }}
       >
         <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', flex: '0 0 auto' }}>

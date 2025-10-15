@@ -16,6 +16,8 @@ import { SignOutIcon } from '@phosphor-icons/react/dist/ssr/SignOut';
 import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
 import { useUser } from '@/hooks/use-user';
+import Avatar from '@mui/material/Avatar';
+import Stack from '@mui/material/Stack';
 
 export interface UserPopoverProps {
   anchorEl: Element | null;
@@ -25,7 +27,7 @@ export interface UserPopoverProps {
 
 export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): React.JSX.Element {
   const { checkSession } = useUser();
-      const { data } =  authClient.getUser();
+    const { data } =  authClient.getUser();
   
   const router = useRouter();
 
@@ -57,12 +59,14 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
       open={open}
       slotProps={{ paper: { sx: { width: '240px' } } }}
     >
-      <Box sx={{ p: '16px 20px ' }}>
-        <Typography variant="subtitle1">{data?.name}</Typography>
-       
-        <Typography color="text.secondary" variant="body2">
-          {data?.email}
-        </Typography>
+      <Box sx={{ p: '12px 16px ' }}>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Avatar src={data?.avatar} sx={{ width: 48, height: 48, bgcolor: '#161950' }}>{!data?.avatar ? (data?.name?.charAt(0).toUpperCase() ?? 'U') : null}</Avatar>
+          <Box>
+            <Typography variant="subtitle1">{data?.name}</Typography>
+            <Typography color="text.secondary" variant="body2">{data?.email}</Typography>
+          </Box>
+        </Stack>
       </Box>
       <Divider />
       <MenuList disablePadding sx={{ p: '8px', '& .MuiMenuItem-root': { borderRadius: 1 } }}>
