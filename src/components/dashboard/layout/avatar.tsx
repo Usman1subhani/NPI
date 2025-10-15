@@ -18,7 +18,7 @@ export const InitialAvatar = React.forwardRef<HTMLDivElement, InitialAvatarProps
         ref={ref}
         onClick={onClick}
         sx={{
-          bgcolor: '#0fb9d8',
+          bgcolor: '#161950',
           color: '#fff',
           cursor: 'pointer',
           ...sx, // merge passed styles

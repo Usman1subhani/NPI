@@ -26,8 +26,7 @@ import TableRow from '@mui/material/TableRow';
 // import { useRouter } from 'next/navigation';
 import { Box } from '@mui/system';
 import { Stack } from '@mui/material';
-import { Button } from '@mui/material';
-// import Avatar from '@mui/material/Avatar';
+import { Button } from '@mui/material'; 
 
 export interface Jobs {
   source: string;          // e.g., 'Indeed', 'LinkedIn'
