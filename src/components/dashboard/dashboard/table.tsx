@@ -113,7 +113,7 @@ export function DashboardTable({
 					}}
 				>
 					<Table sx={{ minWidth: 700 }} stickyHeader>
-						<TableHead>
+						<TableHead sx={{ height: 55 }}>
 							<TableRow>
 								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1 }}>#</TableCell>
 								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, textAlign: 'center' }}>NPI</TableCell>
