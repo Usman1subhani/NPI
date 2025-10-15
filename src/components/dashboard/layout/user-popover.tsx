@@ -59,6 +59,7 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ width: '100%', fontSize: 13, mt: 0.5 }}>
             {data?.email}  
+            // --- IGNORE ---
           </Typography>
         </MenuItem>
         <Divider sx={{ my: 1 }} />
