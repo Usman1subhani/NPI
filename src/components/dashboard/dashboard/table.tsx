@@ -106,7 +106,7 @@ export function DashboardTable({
 				<TableContainer
 					component={Paper}
 					sx={{
-						maxHeight: '160vh', // smaller height
+						maxHeight: '130vh', // smaller height
 						maxWidth: '100%',
 						overflow: 'auto',
 						boxShadow: 'none',
@@ -115,20 +115,20 @@ export function DashboardTable({
 					<Table sx={{ minWidth: 700 }} stickyHeader>
 						<TableHead sx={{ height: 55 }}>
 							<TableRow>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1 }}>#</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, textAlign: 'center' }}>NPI</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Enumeration Type</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>First Name</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Last Name</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, maxWidth: 150 }}>Organization</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, }}>City</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1 }}>State</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Postal Code</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, minWidth: 120, textAlign: 'center' }}>Phone</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, textAlign: 'center' }}>Taxonomy</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Created At</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Updated At</TableCell>
-								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 12, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Enumeration Date</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1 }}>#</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, textAlign: 'center' }}>NPI</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Enumeration Type</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>First Name</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Last Name</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, maxWidth: 150 }}>Organization</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1 }}>City</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1 }}>State</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Postal Code</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, minWidth: 120, textAlign: 'center' }}>Phone</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, textAlign: 'center' }}>Taxonomy</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Created At</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Updated At</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Enumeration Date</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
