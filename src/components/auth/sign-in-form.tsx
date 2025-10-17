@@ -79,54 +79,6 @@ export function SignInForm(): React.JSX.Element {
   );
 
   //----------------- Google sign in logic here -----------------
-  // const handleGoogleSignIn = async (): Promise<void> => {
-  //   setGoogleError(null);
-  //   setIsPending(true);
-  //   try {
-  //     const result = await signInWithPopup(auth, googleProvider);
-  //     const token = await result.user.getIdToken();
-
-  //     const userData = {
-  //       id: result.user.uid,
-  //       name: result.user.displayName,
-  //       email: result.user.email,
-  //       avatar: result.user.photoURL || result.user.providerData?.[0]?.photoURL || null,
-  //     };
-
-  //     // ✅ Send user info to your backend
-  //     const res = await fetch("http://192.168.18.136:4000/google-user", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(userData),
-  //     });
-
-  //     const data = await res.json();
-
-  //     if (res.ok) {
-  //       if (data.status === "approved") {
-  //         // Save token and user for session management
-  //         localStorage.setItem("auth-token", token);
-  //         localStorage.setItem("user", JSON.stringify(userData));
-
-  //         await checkSession?.();
-  //         router.refresh();
-  //       } else if (data.status === "pending") {
-  //         alert("Your account is pending admin approval.");
-  //       } else {
-  //         alert("Access denied. Please contact admin.");
-  //       }
-  //     } else {
-  //       throw new Error(data.message || "Failed to communicate with backend.");
-  //     }
-  //   } catch (err: any) {
-  //     console.error(err);
-  //     setGoogleError(err?.message || String(err));
-  //   } finally {
-  //     setIsPending(false);
-  //   }
-  // };
-  //-------------------------------------------------------------
-
   const handleGoogleSignIn = async (): Promise<void> => {
     setGoogleError(null);
     setIsPending(true);
@@ -134,25 +86,73 @@ export function SignInForm(): React.JSX.Element {
       const result = await signInWithPopup(auth, googleProvider);
       const token = await result.user.getIdToken();
 
-      // Store token and user in localStorage similar to authClient
-      localStorage.setItem('auth-token', token);
-      // Save avatar/photo if available so other components can use it
-      localStorage.setItem('user', JSON.stringify({
+      const userData = {
         id: result.user.uid,
         name: result.user.displayName,
         email: result.user.email,
         avatar: result.user.photoURL || result.user.providerData?.[0]?.photoURL || null,
-      }));
+      };
 
-      // Refresh auth state
-      await checkSession?.();
-      router.refresh();
+      // ✅ Send user info to your backend
+      const res = await fetch("http://192.168.18.136:4000/google-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        if (data.status === "approved") {
+          // Save token and user for session management
+          localStorage.setItem("auth-token", token);
+          localStorage.setItem("user", JSON.stringify(userData));
+
+          await checkSession?.();
+          router.refresh();
+        } else if (data.status === "pending") {
+          alert("Your account is pending admin approval.");
+        } else {
+          alert("Access denied. Please contact admin.");
+        }
+      } else {
+        throw new Error(data.message || "Failed to communicate with backend.");
+      }
     } catch (err: any) {
+      console.error(err);
       setGoogleError(err?.message || String(err));
     } finally {
       setIsPending(false);
     }
   };
+  //-------------------------------------------------------------
+
+  // const handleGoogleSignIn = async (): Promise<void> => {
+  //   setGoogleError(null);
+  //   setIsPending(true);
+  //   try {
+  //     const result = await signInWithPopup(auth, googleProvider);
+  //     const token = await result.user.getIdToken();
+
+  //     // Store token and user in localStorage similar to authClient
+  //     localStorage.setItem('auth-token', token);
+  //     // Save avatar/photo if available so other components can use it
+  //     localStorage.setItem('user', JSON.stringify({
+  //       id: result.user.uid,
+  //       name: result.user.displayName,
+  //       email: result.user.email,
+  //       avatar: result.user.photoURL || result.user.providerData?.[0]?.photoURL || null,
+  //     }));
+
+  //     // Refresh auth state
+  //     await checkSession?.();
+  //     router.refresh();
+  //   } catch (err: any) {
+  //     setGoogleError(err?.message || String(err));
+  //   } finally {
+  //     setIsPending(false);
+  //   }
+  // };
   return (
     <Box sx={{ display: 'flex', minHeight: '50vh' }}>
       {/* Left column: form area */}
