@@ -20,7 +20,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
-import { X, FileCsv } from "@phosphor-icons/react";
+import { X, FileCsv, ChatCenteredText } from "@phosphor-icons/react";
 import axios from "axios";
 import dayjs, { Dayjs } from "dayjs";
 import toast from "react-hot-toast";
@@ -228,14 +228,32 @@ export default function NpiPage() {
 							{showFilters ? 'Hide Filters' : 'Apply Filters'}
 						</Button>
 
+						{/* ✅ New Messaging Button */}
+						<Button
+							variant="contained"
+							startIcon={<ChatCenteredText size={18} />}
+							sx={{
+								backgroundColor: '#161950',
+								minWidth: 120,
+								'&:hover': { backgroundColor: '#004080' },
+							}}
+							onClick={() => {
+								// Collect all numbers from the current filtered rows
+								const numbers = filteredRows
+									.map(r => r.phone)
+									.filter(Boolean)
+									.join(',');
+
+								// Navigate to messaging page with numbers as query
+								window.location.href = `/dashboard/messaging?to=${encodeURIComponent(numbers)}`;
+							}}
+						>
+							Message
+						</Button>
+
 						{/* Export Button */}
 						{exporting ? (
-							<CircularProgress
-								size={24}
-								sx={{
-									color: "#161950",
-								}}
-							/>
+							<CircularProgress size={24} sx={{ color: "#161950" }} />
 						) : (
 							<Button
 								variant="contained"

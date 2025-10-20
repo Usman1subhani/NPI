@@ -87,7 +87,7 @@ export function DashboardTable({
 			const lastNameMatch = row.lastName?.toLowerCase().includes(searchLower);
 			const stateMatch = !stateFilter || row.state === stateFilter;
 			const cityMatch = !cityFilter || row.city === cityFilter;
-			const orgMatch = !orgFilter || row.orgName === orgFilter;
+			const orgMatch = !orgFilter || row.orgName === orgFilter; 
 			// Date filter: filter by createdAt
 			const dateMatch = !selectedDate || (row.createdAt && dayjs(row.createdAt).isSame(selectedDate, 'day'));
 			return (!searchTerm || firstNameMatch || lastNameMatch) && stateMatch && cityMatch && orgMatch && dateMatch;
