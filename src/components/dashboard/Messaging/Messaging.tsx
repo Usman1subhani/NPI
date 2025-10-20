@@ -72,11 +72,10 @@ export default function Messaging({ initialNumbers = [] }: { initialNumbers?: st
                                 onDelete={() => handleRemoveNumber(num)}
                                 deleteIcon={
                                     <IconButton size="small">
-                                        <X size={14} weight="bold" />
+                                        <X size={14} weight="bold" color="Red"/>
                                     </IconButton>
                                 }
-                                color="primary"
-                                sx={{ m: 0.5 }}
+                                sx={{ m: 0.5, backgroundColor: '#161950', '&:hover': { backgroundColor: '#004080' }, color: "white" }}
                             />
                         ))}
                         <TextField
@@ -105,7 +104,7 @@ export default function Messaging({ initialNumbers = [] }: { initialNumbers?: st
                 <Box textAlign="right">
                     <Button
                         variant="contained"
-                        color="primary"
+                        sx={{ backgroundColor: '#161950', '&:hover': { backgroundColor: '#004080' } }}
                         endIcon={<PaperPlaneTilt size={18} weight="fill" />}
                         onClick={handleSend}
                     >
