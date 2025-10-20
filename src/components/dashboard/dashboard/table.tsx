@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { Box, Tooltip, TextField, Button, IconButton, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
-import Card from "@mui/material/Card"; 
-import Divider from "@mui/material/Divider"; 
+import Card from "@mui/material/Card";
+import Divider from "@mui/material/Divider";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Table from "@mui/material/Table";
@@ -84,7 +84,7 @@ export function DashboardTable({
 			const lastNameMatch = row.lastName?.toLowerCase().includes(searchLower);
 			const stateMatch = !stateFilter || row.state === stateFilter;
 			const cityMatch = !cityFilter || row.city === cityFilter;
-			const orgMatch = !orgFilter || row.orgName === orgFilter; 
+			const orgMatch = !orgFilter || row.orgName === orgFilter;
 			// Date filter: filter by createdAt
 			const dateMatch = !selectedDate || (row.createdAt && dayjs(row.createdAt).isSame(selectedDate, 'day'));
 			return (!searchTerm || firstNameMatch || lastNameMatch) && stateMatch && cityMatch && orgMatch && dateMatch;
