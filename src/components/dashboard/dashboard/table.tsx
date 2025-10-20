@@ -185,9 +185,9 @@ export function DashboardTable({
 												"No Taxonomy"
 											)}
 										</TableCell>
-										<TableCell sx={{ fontSize: 12 }}>{new Date(row.createdAt ?? "").toLocaleDateString()}</TableCell>
-										<TableCell sx={{ fontSize: 12 }}>{new Date(row.updatedAt ?? "").toLocaleDateString()}</TableCell>
-										<TableCell sx={{ fontSize: 12 }}>{new Date(row.enumerationDate ?? "").toLocaleDateString()}</TableCell>
+										<TableCell sx={{ fontSize: 12 }}>{new Date(row.createdAt ?? "--").toLocaleDateString()}</TableCell>
+										<TableCell sx={{ fontSize: 12 }}>{new Date(row.updatedAt ?? "--").toLocaleDateString()}</TableCell>
+										<TableCell sx={{ fontSize: 12 }}>{new Date(row.enumerationDate ?? "--").toLocaleDateString()}</TableCell>
 									</TableRow>
 								))
 							) : (

@@ -51,8 +51,8 @@ export default function NpiPage() {
 	const formatDateString = (date: Dayjs | null) =>
 		date ? date.format("YYYY-MM-DD") : "";
 
-	const [startDate, setStartDate] = useState<Dayjs | null>(dayjs(monday));
-	const [endDate, setEndDate] = useState<Dayjs | null>(dayjs(sunday));
+	const [startDate, setStartDate] = useState<Dayjs | null>(null);
+	const [endDate, setEndDate] = useState<Dayjs | null>(null);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [stateFilter, setStateFilter] = useState("");
 	const [cityFilter, setCityFilter] = useState("");
@@ -63,13 +63,12 @@ export default function NpiPage() {
 		setLoading(true);
 		try {
 			const res = await fetchNpiData({
-				startDate: formatDateString(startDate),
-				endDate: formatDateString(endDate),
+				startDate: startDate ? formatDateString(startDate) : "", // only send if selected
+				endDate: endDate ? formatDateString(endDate) : "",       // only send if selected
 				page: page + 1,
 				limit: rowsPerPage,
 			});
 			setRows(res.data || []);
-			console.log(res.data);
 			setTotalRows(res.total || res.data.length);
 		} catch (err) {
 			console.error(err);
@@ -78,9 +77,14 @@ export default function NpiPage() {
 		}
 	};
 
+
+	// --- update useEffect to load data only if start date exists ---
 	useEffect(() => {
-		loadData();
-	}, [page, rowsPerPage]);
+		loadData(); // always load initially and on changes
+	}, [page, rowsPerPage, startDate, endDate]);
+
+
+	// --- update loadData() to skip when no start date selected ---
 
 	// Compute unique options for filters
 	const states = useMemo(() => Array.from(new Set(rows.map(r => r.state).filter(Boolean))), [rows]);
@@ -104,15 +108,13 @@ export default function NpiPage() {
 
 			// Date range filter
 			let dateMatch = true;
-			if (startDate || endDate) {
-				const created = row.createdAt ? dayjs(row.createdAt) : null;
-				if (created) {
-					if (startDate && created.isBefore(startDate, 'day')) dateMatch = false;
-					if (endDate && created.isAfter(endDate, 'day')) dateMatch = false;
-				} else {
-					dateMatch = false;
-				}
+			if (startDate && row.updatedAt) {
+				dateMatch = !dayjs(row.updatedAt).isBefore(startDate, "day");
 			}
+			if (endDate && row.updatedAt) {
+				dateMatch = dateMatch && !dayjs(row.updatedAt).isAfter(endDate, "day");
+			}
+
 
 			return nameMatch && stateMatch && cityMatch && orgMatch && dateMatch;
 		});
@@ -164,8 +166,9 @@ export default function NpiPage() {
 		setStateFilter("");
 		setCityFilter("");
 		setOrgFilter("");
-		setStartDate(dayjs(monday));
-		setEndDate(dayjs(sunday));
+		setStartDate(null);
+		setEndDate(null);
+		setRows([]); // clear data
 		setShowFilters(false);
 	};
 
@@ -316,21 +319,43 @@ export default function NpiPage() {
 							</FormControl>
 
 							{/* Date Picker - Single Date Picker */}
+							{/* Date Range Pickers */}
 							<LocalizationProvider dateAdapter={AdapterDayjs}>
-								<DatePicker
-									label="Select Date"
-									value={startDate}
-									onChange={(newValue) => {
-										setStartDate(newValue);
-										setEndDate(newValue); // Set both to same date for single date selection
-									}}
-									slotProps={{
-										textField: {
-											size: 'small',
-											sx: { width: 150 }
-										}
-									}}
-								/>
+								<Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
+									{/* Start Date Picker */}
+									<DatePicker
+										label="Start Date"
+										value={startDate}
+										onChange={(newValue) => {
+											setStartDate(newValue);
+											if (!endDate || (newValue && endDate.isBefore(newValue))) {
+												// if end date is before new start, reset it
+												setEndDate(null);
+											}
+										}}
+										slotProps={{
+											textField: {
+												size: 'small',
+												sx: { width: 150 },
+											},
+										}}
+									/>
+
+									{/* End Date Picker */}
+									<DatePicker
+										label="End Date"
+										value={endDate}
+										onChange={(newValue) => setEndDate(newValue)}
+										disabled={!startDate} // only active after start date selected
+										minDate={startDate || undefined}
+										slotProps={{
+											textField: {
+												size: 'small',
+												sx: { width: 150 },
+											},
+										}}
+									/>
+								</Stack>
 							</LocalizationProvider>
 
 							{/* Clear Filters Button */}
