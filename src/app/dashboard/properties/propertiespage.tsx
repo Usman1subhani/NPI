@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography';
 // import { UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 
 import { PropertiesCard } from '@/components/dashboard/properties/properties-card';
-import { PropertiesFilters } from '@/components/dashboard/properties/properties-filters';
+// import { PropertiesFilters } from '@/components/dashboard/properties/properties-filters';
 import { dummyRows } from '@/components/dashboard/properties/dummypropertiesrows';
 
 export default function Page(): React.JSX.Element {
@@ -25,7 +25,7 @@ export default function Page(): React.JSX.Element {
         </Stack>
        
       </Stack>
-      <PropertiesFilters />
+      {/* <PropertiesFilters /> */}
    
           <PropertiesCard count={dummyRows.length} page={0} rows={dummyRows} rowsPerPage={5} />
         
