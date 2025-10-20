@@ -7,7 +7,8 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
-import { SignOutIcon } from '@phosphor-icons/react/dist/ssr/SignOut';
+import { SignOutIcon, } from '@phosphor-icons/react/dist/ssr/SignOut';
+import { GearSix } from "@phosphor-icons/react";
 import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
 import { useUser } from '@/hooks/use-user';
@@ -41,6 +42,15 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
     }
   }, [checkSession, router]);
 
+
+  const forgotPassword = React.useCallback(async (): Promise<void> => {
+    try {
+      router.push('/auth/reset-password');
+    } catch (error) {
+      logger.error('Navigation to reset password error', error);
+    }
+  }, [router]);
+
   return (
     <Popover
       anchorEl={anchorEl}
@@ -58,10 +68,24 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
             {data?.name}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ width: '100%', fontSize: 13, mt: 0.5 }}>
-            {data?.email}   
+            {data?.email}
           </Typography>
         </MenuItem>
+
         <Divider sx={{ my: 1 }} />
+
+        <MenuItem onClick={forgotPassword} sx={{ color: 'inherit', display: 'flex', alignItems: 'center', gap: 1 }}>
+          <ListItemIcon sx={{ color: 'inherit', minWidth: '32px', display: 'flex', justifyContent: 'center' }}>
+            <GearSix size={20} weight="bold" />
+          </ListItemIcon>
+          <Typography variant="body2" sx={{ fontSize: 14, fontWeight: 500 }}>
+            Reset Password
+          </Typography>
+        </MenuItem>
+
+
+        <Divider sx={{ my: 1 }} />
+
         <MenuItem onClick={handleSignOut} sx={{ color: 'error.main' }}>
           <ListItemIcon sx={{ color: 'inherit' }}>
             <SignOutIcon fontSize="var(--icon-fontSize-md)" />

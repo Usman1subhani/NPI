@@ -3,18 +3,21 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Alert from "@mui/material/Alert";
-import Button from "@mui/material/Button";
-import FormControl from "@mui/material/FormControl";
-import FormHelperText from "@mui/material/FormHelperText";
-import InputLabel from "@mui/material/InputLabel";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
+import {
+	Alert,
+	Button,
+	FormControl,
+	FormHelperText,
+	InputLabel,
+	OutlinedInput,
+	Stack,
+	Typography,
+	Paper,
+	CircularProgress,
+} from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z as zod } from "zod";
-
 import { authClient } from "@/lib/auth/client";
 import { useUser } from "@/hooks/use-user";
 
@@ -45,23 +48,21 @@ export function SecureResetPasswordForm(): React.JSX.Element {
 	const user = localStorage.getItem("user");
 	const email = user ? JSON.parse(user).email : "";
 	const router = useRouter();
-    const { checkSession } = useUser();
-  
-	// Form hook (we will change schema dynamically per step)
+	const { checkSession } = useUser();
+
 	const {
 		control,
 		handleSubmit,
 		reset,
 		formState: { errors },
 	} = useForm<FormValues>({
-		resolver: zodResolver(fullSchema), // only used for typing at init
+		resolver: zodResolver(fullSchema),
 		defaultValues: { otp: "", password: "", confirmPassword: "" },
 	});
 
-	// Step change helper
 	const setSchema = (newSchema: any) => {
-		reset(); // Clear old data
-		(control as any)._options.resolver = zodResolver(newSchema); // Swap schema dynamically
+		reset();
+		(control as any)._options.resolver = zodResolver(newSchema);
 	};
 
 	const onSubmit = async (values: any) => {
@@ -70,8 +71,7 @@ export function SecureResetPasswordForm(): React.JSX.Element {
 
 		try {
 			if (step === "SendOtp") {
-				// Send OTP automatically
-				const otpRes = await authClient.sendPasswordOtp({ email: email });
+				const otpRes = await authClient.sendPasswordOtp({ email });
 				if (otpRes.error) throw new Error(otpRes.error);
 				setSchema(otpSchema);
 				setStep("verifyOtp");
@@ -81,16 +81,15 @@ export function SecureResetPasswordForm(): React.JSX.Element {
 				setSchema(newPasswordSchema);
 				setStep("setNewPassword");
 			} else if (step === "setNewPassword") {
-       if(values.password!=values.confirmPassword){
-         setRootError("Passwords do not match");
-         return;
-       }
+				if (values.password !== values.confirmPassword) {
+					setRootError("Passwords do not match");
+					return;
+				}
 				const { error } = await authClient.updatePassword({ email, password: values.password });
 				if (error) throw new Error(error);
 				toast.success("Password updated successfully.");
-				localStorage.removeItem("resetToken");
-        authClient.signOut();
-					await checkSession?.();
+				authClient.signOut();
+				await checkSession?.();
 				router.refresh();
 			}
 		} catch (err: any) {
@@ -101,78 +100,147 @@ export function SecureResetPasswordForm(): React.JSX.Element {
 	};
 
 	return (
-		<Stack spacing={4}>
-			<Typography variant="h5">
-				{step === "SendOtp" && "Send Otp"}
-				{step === "verifyOtp" && "Verify Email OTP"}
-				{step === "setNewPassword" && "Set New Password"}
-			</Typography>
+		<Paper
+			elevation={3}
+			sx={{
+				maxWidth: 480,
+				mx: "auto",
+				mt: 8,
+				p: 4,
+				borderRadius: 3,
+				boxShadow: "0px 6px 20px rgba(0,0,0,0.08)",
+				border: "1px solid #e6e6e6",
+			}}
+		>
+			<Stack spacing={4}>
+				<Typography
+					variant="h5"
+					sx={{
+						fontWeight: 700,
+						textAlign: "center",
+						color: "#161950",
+						letterSpacing: 0.5,
+					}}
+				>
+					{step === "SendOtp" && "Send OTP"}
+					{step === "verifyOtp" && "Verify Email OTP"}
+					{step === "setNewPassword" && "Set New Password"}
+				</Typography>
 
-			<form onSubmit={handleSubmit(onSubmit)}>
-				<Stack spacing={2}>
-					{step === "SendOtp" && (
-						<FormControl sx={{ mb: 2, display: "flex" }}>
-							<InputLabel>Email</InputLabel>
-							<OutlinedInput
-								value={email} // set value from state
-								label="Email"
-								type="email"
-								readOnly // make input non-editable
+				<form onSubmit={handleSubmit(onSubmit)}>
+					<Stack spacing={3}>
+						{step === "SendOtp" && (
+							<FormControl sx={{ mb: 1 }}>
+								<InputLabel>Email</InputLabel>
+								<OutlinedInput
+									value={email}
+									label="Email"
+									type="email"
+									readOnly
+									sx={{
+										borderRadius: "10px",
+										backgroundColor: "#f9f9f9",
+									}}
+								/>
+							</FormControl>
+						)}
+
+						{step === "verifyOtp" && (
+							<Controller
+								control={control}
+								name="otp"
+								render={({ field }) => (
+									<FormControl error={Boolean(errors.otp)}>
+										<InputLabel>OTP Code</InputLabel>
+										<OutlinedInput
+											{...field}
+											label="OTP Code"
+											sx={{
+												borderRadius: "10px",
+												backgroundColor: "#fff",
+											}}
+										/>
+										{errors.otp && <FormHelperText>{errors.otp.message}</FormHelperText>}
+									</FormControl>
+								)}
 							/>
-						</FormControl>
-					)}
+						)}
 
-					{step === "verifyOtp" && (
-						<Controller
-							control={control}
-							name="otp"
-							render={({ field }) => (
-								<FormControl error={Boolean(errors.otp)}>
-									<InputLabel>OTP code</InputLabel>
-									<OutlinedInput {...field} label="OTP code" />
-									{errors.otp && <FormHelperText>{errors.otp.message}</FormHelperText>}
-								</FormControl>
+						{step === "setNewPassword" && (
+							<>
+								<Controller
+									control={control}
+									name="password"
+									render={({ field }) => (
+										<FormControl error={Boolean(errors.password)}>
+											<InputLabel>New Password</InputLabel>
+											<OutlinedInput
+												{...field}
+												label="New Password"
+												type="password"
+												autoComplete="off"
+												sx={{
+													borderRadius: "10px",
+													backgroundColor: "#fff",
+												}}
+											/>
+											{errors.password && <FormHelperText>{errors.password.message}</FormHelperText>}
+										</FormControl>
+									)}
+								/>
+								<Controller
+									control={control}
+									name="confirmPassword"
+									render={({ field }) => (
+										<FormControl error={Boolean(errors.confirmPassword)}>
+											<InputLabel>Confirm Password</InputLabel>
+											<OutlinedInput
+												{...field}
+												label="Confirm Password"
+												type="password"
+												autoComplete="off"
+												sx={{
+													borderRadius: "10px",
+													backgroundColor: "#fff",
+												}}
+											/>
+											{errors.confirmPassword && (
+												<FormHelperText>{errors.confirmPassword.message}</FormHelperText>
+											)}
+										</FormControl>
+									)}
+								/>
+							</>
+						)}
+
+						{rootError && <Alert severity="error">{rootError}</Alert>}
+
+						<Button
+							type="submit"
+							variant="contained"
+							disabled={isPending}
+							sx={{
+								backgroundColor: "#161950",
+								color: "#fff",
+								py: 1.2,
+								borderRadius: "10px",
+								fontWeight: 600,
+								"&:hover": { backgroundColor: '#004080' },
+							}}
+						>
+							{isPending ? (
+								<CircularProgress size={24} sx={{ color: "#fff" }} />
+							) : step === "SendOtp" ? (
+								"Send OTP"
+							) : step === "verifyOtp" ? (
+								"Verify OTP"
+							) : (
+								"Update Password"
 							)}
-						/>
-					)}
-
-					{step === "setNewPassword" && (
-						<>
-							<Controller
-								control={control}
-								name="password"
-								render={({ field }) => (
-									<FormControl error={Boolean(errors.password)}>
-										<InputLabel>New password</InputLabel>
-										<OutlinedInput autoComplete="off" {...field} label="New password" type="password" />
-										{errors.password && <FormHelperText>{errors.password.message}</FormHelperText>}
-									</FormControl>
-								)}
-							/>
-							<Controller
-								control={control}
-								name="confirmPassword"
-								render={({ field }) => (
-									<FormControl error={Boolean(errors.confirmPassword)}>
-										<InputLabel>Confirm password</InputLabel>
-										<OutlinedInput  autoComplete="off" {...field} label="Confirm password" type="password" />
-										{errors.confirmPassword && <FormHelperText>{errors.confirmPassword.message}</FormHelperText>}
-									</FormControl>
-								)}
-							/>
-						</>
-					)}
-
-					{rootError && <Alert color="error">{rootError}</Alert>}
-					<div style={{ display: "flex", justifyContent: "center" }}>
-						<Button disabled={isPending} type="submit" sx={{ backgroundColor: "#0fb9d8" }} variant="contained">
-							{step === "SendOtp" && "Send OTP"}
-							{step === "verifyOtp" && "Verify OTP"}
-							{step === "setNewPassword" && "Update Password"}
 						</Button>
-					</div>
-				</Stack>
-			</form>
-		</Stack>
+					</Stack>
+				</form>
+			</Stack>
+		</Paper>
 	);
 }
