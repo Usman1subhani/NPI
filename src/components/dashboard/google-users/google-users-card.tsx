@@ -89,22 +89,22 @@ export function PropertiesCard({
 
 
   return (
-    <Card sx={{ borderRadius: 3, p: 2 }}>
+    <Card sx={{ borderRadius: 0, p: 2 }}>
       <Box sx={{ overflowX: "auto" }}>
         <Table sx={{ minWidth: 800 }}>
           <TableHead>
             <TableRow>
               <TableCell>
-                <Typography fontWeight={600}>#</Typography>
+                <Typography fontWeight={600} fontSize={14}>#</Typography>
               </TableCell>
               <TableCell>
-                <Typography fontWeight={600}>NAME</Typography>
+                <Typography fontWeight={600} fontSize={14}>NAME</Typography>
               </TableCell>
               <TableCell>
-                <Typography fontWeight={600}>STATUS</Typography>
+                <Typography fontWeight={600} fontSize={14}>STATUS</Typography>
               </TableCell>
               <TableCell align="center">
-                <Typography fontWeight={600}>ACTIONS</Typography>
+                <Typography fontWeight={600} fontSize={14}>ACTIONS</Typography>
               </TableCell>
             </TableRow>
           </TableHead>
@@ -114,7 +114,7 @@ export function PropertiesCard({
               <TableRow key={user.id} hover>
                 {/* ID */}
                 <TableCell>
-                  <Chip label={user.id} size="small" sx={{ fontWeight: 500 }} />
+                  <Chip label={user.id} size="small" sx={{ fontWeight: 500, fontSize: 13 }} />
                 </TableCell>
 
                 {/* Name */}
@@ -122,7 +122,7 @@ export function PropertiesCard({
                   <Stack direction="row" alignItems="center" spacing={2}>
                     <Avatar src={user.avatar} alt={user.name} sx={{ width: 40, height: 40 }} />
                     <Box>
-                      <Typography fontWeight={600}>{user.name}</Typography>
+                      <Typography fontWeight={600} fontSize={14}>{user.name}</Typography>
                       <Typography variant="body2" color="text.secondary">
                         {user.email}
                       </Typography>
@@ -142,6 +142,7 @@ export function PropertiesCard({
                             ? "orange"
                             : "red",
                       fontWeight: 600,
+                      fontSize: 13,
                     }}
                   >
                     {user.status}
@@ -168,7 +169,7 @@ export function PropertiesCard({
                         },
                       }}
                     >
-                      <CheckCircle size={18} />
+                      <CheckCircle size={15} />
                     </IconButton>
 
                     {/* Delete */}
@@ -180,11 +181,10 @@ export function PropertiesCard({
                         "&:hover": { backgroundColor: "#FFCDD2" },
                       }}
                     >
-                      <Trash size={18} />
+                      <Trash size={15} />
                     </IconButton>
                   </Stack>
                 </TableCell>
-
               </TableRow>
             ))}
           </TableBody>
