@@ -13,6 +13,9 @@ export const paths = {
 	properties: {
 		list: "/dashboard/properties",
 	},
+	lead: {
+		leads: "/dashboard/Leads",
+	}, 
 	messaging: {
 		inbox: "/dashboard/messaging",
 	},

@@ -27,6 +27,7 @@ import toast from "react-hot-toast";
 
 import { DashboardTable, NpiRegistry } from "@/components/dashboard/dashboard/table";
 import { fetchNpiData } from "../../../lib/npi";
+import { Loader } from "@/components/core/loader";
 
 export default function NpiPage() {
 	const [rows, setRows] = useState<NpiRegistry[]>([]);
@@ -410,19 +411,22 @@ export default function NpiPage() {
 			</Card>
 
 			{/* Table */}
-			<DashboardTable
-				count={totalRows}
-				page={page}
-				rows={filteredRows}
-				rowsPerPage={rowsPerPage}
-				onPageChange={(_, newPage) => setPage(newPage)}
-				rowsPerPageOptions={[10, 25, 50, 100]}
-				onRowsPerPageChange={(e) => {
-					setRowsPerPage(parseInt(e.target.value, 10));
-					setPage(0);
-				}}
-				loading={loading}
-			/>
+			{loading ? (
+				<Loader />
+			) : (
+				<DashboardTable
+					count={totalRows}
+					page={page}
+					rows={filteredRows}
+					rowsPerPage={rowsPerPage}
+					onPageChange={(_, newPage) => setPage(newPage)}
+					rowsPerPageOptions={[10, 25, 50, 100]}
+					onRowsPerPageChange={(e) => {
+						setRowsPerPage(parseInt(e.target.value, 10));
+						setPage(0);
+					}}
+				/>
+			)}
 		</Stack>
 	);
 }

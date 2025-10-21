@@ -1,8 +1,11 @@
+'use client';
+
 import * as React from 'react';
 // import RouterLink from 'next/link';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { Loader } from '@/components/core/loader';
 
 // import { paths } from '@/paths';
 // import { DynamicLogo } from '@/components/core/logo';
@@ -12,6 +15,15 @@ export interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps): React.JSX.Element {
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    // Add a small delay to show loading state
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
   return (
     <Box
       sx={{
@@ -23,7 +35,9 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
     >
       <Box sx={{ display: 'flex', flex: '1 1 auto', flexDirection: 'column' }}>
         <Box sx={{ alignItems: 'center', display: 'flex', flex: '1 1 auto', justifyContent: 'center', p: 3 }}>
-          <Box sx={{ maxWidth: '550px', width: '100%' }}>{children}</Box>
+          <Box sx={{ maxWidth: '550px', width: '100%' }}>
+            {isLoading ? <Loader /> : children}
+          </Box>
         </Box>
       </Box>
       <Box
