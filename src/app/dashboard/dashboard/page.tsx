@@ -51,8 +51,9 @@ export default function NpiPage() {
 	const formatDateString = (date: Dayjs | null) =>
 		date ? date.format("YYYY-MM-DD") : "";
 
-	const [startDate, setStartDate] = useState<Dayjs | null>(null);
-	const [endDate, setEndDate] = useState<Dayjs | null>(null);
+	const [startDate, setStartDate] = useState<Dayjs | null>(dayjs(monday));
+	const [endDate, setEndDate] = useState<Dayjs | null>(dayjs(sunday));
+
 	const [searchTerm, setSearchTerm] = useState("");
 	const [stateFilter, setStateFilter] = useState("");
 	const [cityFilter, setCityFilter] = useState("");
@@ -410,13 +411,13 @@ export default function NpiPage() {
 
 			{/* Table */}
 			<DashboardTable
-				count={filteredRows.length}
+				count={totalRows}
 				page={page}
 				rows={filteredRows}
 				rowsPerPage={rowsPerPage}
-				onPageChange={(_event: unknown, newPage: number) => setPage(newPage)}
+				onPageChange={(_, newPage) => setPage(newPage)}
 				rowsPerPageOptions={[10, 25, 50, 100]}
-				onRowsPerPageChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+				onRowsPerPageChange={(e) => {
 					setRowsPerPage(parseInt(e.target.value, 10));
 					setPage(0);
 				}}

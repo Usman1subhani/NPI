@@ -17,7 +17,8 @@ import Typography from "@mui/material/Typography";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import { useState } from "react";
 // import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 // import dayjs from 'dayjs';
@@ -58,12 +59,22 @@ export function DashboardTable({
 	count = 0,
 	rows = [],
 	page = 0,
-	rowsPerPage = 0,
+	rowsPerPage = 10,
 	onPageChange,
 	onRowsPerPageChange,
 	rowsPerPageOptions = [10, 25, 50, 100],
 	loading = false,
 }: DashboardTableProps): React.JSX.Element {
+	//for current week date in date picker 
+	const today = new Date();
+	const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ...
+	const monday = new Date(today);
+	monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7)); // Monday
+	const sunday = new Date(monday);
+	sunday.setDate(monday.getDate() + 6); // Sunday
+
+	const [startDate, setStartDate] = useState<Dayjs | null>(dayjs(monday));
+	const [endDate, setEndDate] = useState<Dayjs | null>(dayjs(sunday));
 	// Unique values for filters
 	const states = React.useMemo(() => Array.from(new Set(rows.map(r => r.state).filter(Boolean))), [rows]);
 	const cities = React.useMemo(() => Array.from(new Set(rows.map(r => r.city).filter(Boolean))), [rows]);
@@ -132,7 +143,7 @@ export function DashboardTable({
 							{filteredRows && filteredRows.length > 0 ? (
 								filteredRows.map((row, index) => (
 									<TableRow hover key={row.npi} sx={{ fontSize: 12 }}>
-										<TableCell sx={{ fontSize: 12 }}>{index + 1}</TableCell>
+										<TableCell sx={{ fontSize: 12 }}>{(page * rowsPerPage) + index + 1}</TableCell>
 										<TableCell sx={{ fontSize: 12, }}>{row.npi}</TableCell>
 										<TableCell sx={{ fontSize: 12, textAlign: 'center' }}>{row.enumerationType || "N/A"}</TableCell>
 										<TableCell sx={{ fontSize: 12 }}>{row.firstName || "-"}</TableCell>
@@ -204,7 +215,7 @@ export function DashboardTable({
 				<Box sx={{ p: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
 					<TablePagination
 						component="div"
-						count={filteredRows.length}
+						count={count ?? filteredRows.length}
 						page={page ?? 0}
 						onPageChange={onPageChange}
 						rowsPerPage={rowsPerPage ?? 10}
