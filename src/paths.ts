@@ -10,8 +10,8 @@ export const paths = {
 	dashboard: {
 		dashboard: "/dashboard",
 	},
-	properties: {
-		list: "/dashboard/properties",
+	google: {
+		list: "/dashboard/google-users",
 	},
 	lead: {
 		leads: "/dashboard/Leads",

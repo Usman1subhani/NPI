@@ -51,7 +51,9 @@ export function MainNav(): React.JSX.Element {
 						</Tooltip> */}
 						<Tooltip title="Title">
 
-							<h2>MedCredPro RCM</h2>
+							{/* <h2>MedCredPro RCM</h2> */}
+							<h2>Medical Billing</h2>
+
 
 						</Tooltip>
 						{/* <Tooltip title="Notifications">
