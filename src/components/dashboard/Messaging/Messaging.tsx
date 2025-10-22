@@ -9,8 +9,14 @@ import {
     Button,
     Chip,
     IconButton,
+    CircularProgress,
+    Alert,
 } from "@mui/material";
 import { PaperPlaneTilt, X } from "@phosphor-icons/react";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert, { AlertColor } from "@mui/material/Alert";
+import { sendMessageAPI } from "@/app/dashboard/messaging/client";
+
 
 export default function Messaging({ initialNumbers = [] }: { initialNumbers?: string[] }) {
     const [numbers, setNumbers] = useState<string[]>(initialNumbers);
@@ -18,6 +24,12 @@ export default function Messaging({ initialNumbers = [] }: { initialNumbers?: st
     const [message, setMessage] = useState("");
     const [isShrunk, setIsShrunk] = useState(false); // shrink "To" section when composing
     const toBoxRef = useRef<HTMLDivElement>(null);
+    const [loading, setLoading] = useState(false);
+    const [snackbar, setSnackbar] = useState<{
+        open: boolean;
+        message: string;
+        severity: "success" | "error" | "info" | "warning";
+    }>({ open: false, message: "", severity: "info" });
 
     // Scroll automatically to bottom when new chip added
     useEffect(() => {
@@ -26,28 +38,81 @@ export default function Messaging({ initialNumbers = [] }: { initialNumbers?: st
         }
     }, [numbers]);
 
+    //! ---------------------- Validation Functions ----------------------
+    // ✅ Format to +1xxxxxxxxxx
+    const formatNumber = (num: string) => {
+        const digits = num.replace(/\D/g, ""); // remove all non-digits
+        if (digits.length === 10) return `+1${digits}`;
+        if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+        return num;
+    };
+    // ✅ Validate number is U.S. mobile type
+    const isValidUSNumber = (num: string) => /^\+1\d{10}$/.test(num);
+
+    // Example: fake landline prefixes
+    const isLandline = (num: string) => {
+        const areaCode = num.slice(2, 5);
+        const landlineCodes = ["212", "213", "305", "408", "512", "617", "703"];
+        return landlineCodes.includes(areaCode);
+    };
+    //! -----------------------------------------------------------------
     const handleAddNumber = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter" && inputValue.trim() !== "") {
             e.preventDefault();
-            if (!numbers.includes(inputValue.trim())) {
-                setNumbers([...numbers, inputValue.trim()]);
-            }
+            const formatted = formatNumber(inputValue.trim());
+            if (!numbers.includes(formatted)) setNumbers([...numbers, formatted]);
             setInputValue("");
         }
     };
-
     const handleRemoveNumber = (num: string) => {
         setNumbers(numbers.filter((n) => n !== num));
     };
 
-    const handleSend = () => {
+    //! ---------------------- Sending Messages ----------------------
+    const showSnackbar = (
+        message: string,
+        severity: "success" | "error" | "info" | "warning"
+    ) => {
+        setSnackbar({ open: true, message, severity });
+    };
+
+    const handleSend = async () => {
         if (numbers.length === 0 || message.trim() === "") {
-            alert("Please add at least one number and write a message.");
+            showSnackbar("Please add at least one number and write a message.", "warning");
             return;
         }
-        console.log("📤 Sending message to:", numbers, "Message:", message);
-        setMessage("");
-        setIsShrunk(false);
+
+        setLoading(true);
+
+        const validNumbers = numbers.filter(isValidUSNumber);
+        const invalidNumbers = numbers.filter((n) => !isValidUSNumber(n));
+        const nonLandlineNumbers = validNumbers.filter((n) => !isLandline(n));
+        const rejected = [...invalidNumbers, ...validNumbers.filter(isLandline)];
+
+        if (nonLandlineNumbers.length === 0) {
+            showSnackbar("No valid mobile numbers found!", "error");
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const res = await sendMessageAPI(nonLandlineNumbers, message);
+            if (res.success) {
+                showSnackbar("Message(s) sent successfully!", "success");
+            } else {
+                showSnackbar("Failed to send messages!", "error");
+            }
+
+            if (rejected.length > 0) {
+                showSnackbar(`Skipped invalid/landline numbers: ${rejected.join(", ")}`, "warning");
+            }
+        } catch (err) {
+            showSnackbar("Error while sending messages!", "error");
+        } finally {
+            setLoading(false);
+            setMessage("");
+            setIsShrunk(false);
+        }
     };
 
     return (
@@ -135,14 +200,32 @@ export default function Messaging({ initialNumbers = [] }: { initialNumbers?: st
                         sx={{
                             backgroundColor: "#161950",
                             "&:hover": { backgroundColor: "#004080" },
+                            width: 120,
                         }}
-                        endIcon={<PaperPlaneTilt size={18} weight="fill" />}
+                        endIcon={!loading && <PaperPlaneTilt size={18} weight="fill" />}
                         onClick={handleSend}
+                        disabled={loading}
                     >
-                        Send
+                        {loading ? <CircularProgress size={20} color="inherit" /> : "Send"}
                     </Button>
                 </Box>
             </Stack>
+            {/* ✅ Snackbar for feedback */}
+            {/* Snackbar */}
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            >
+                <Alert
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    severity={snackbar.severity}
+                    variant="filled"
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Card>
     );
 }
