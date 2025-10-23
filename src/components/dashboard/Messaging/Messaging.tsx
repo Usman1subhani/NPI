@@ -19,7 +19,8 @@ import { sendMessageAPI } from "@/app/dashboard/messaging/client";
 
 
 export default function Messaging({ initialNumbers = [] }: { initialNumbers?: string[] }) {
-    const [numbers, setNumbers] = useState<string[]>(initialNumbers);
+    // keep raw numbers normalized in state (format to API-accepted '1XXXXXXXXXX')
+    const [numbers, setNumbers] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState("");
     const [message, setMessage] = useState("");
     const [isShrunk, setIsShrunk] = useState(false); // shrink "To" section when composing
@@ -37,6 +38,23 @@ export default function Messaging({ initialNumbers = [] }: { initialNumbers?: st
             toBoxRef.current.scrollTop = toBoxRef.current.scrollHeight;
         }
     }, [numbers]);
+
+    // Normalize and dedupe initial numbers coming from the dashboard (e.g. "337-427-8230")
+    useEffect(() => {
+        if (!initialNumbers || initialNumbers.length === 0) return;
+
+        const processed = initialNumbers
+            .map((s) => (s || '').toString().trim())
+            .filter(Boolean)
+            .map((s) => formatNumber(s))
+            .filter(Boolean);
+
+        // dedupe
+        const unique = Array.from(new Set(processed));
+
+        // set normalized numbers into state
+        setNumbers(unique);
+    }, [initialNumbers]);
 
     //! ---------------------- Validation Functions ----------------------
     // ✅ Format to 1xxxxxxxxxx (without +)
@@ -97,20 +115,43 @@ export default function Messaging({ initialNumbers = [] }: { initialNumbers?: st
 
         try {
             const res = await sendMessageAPI(nonLandlineNumbers, message);
-            if (res.success) {
-                showSnackbar("Message(s) sent successfully!", "success");
-            } else {
-                showSnackbar("Failed to send messages!", "error");
+
+            // Show skipped numbers (invalid/landline) as a concise message
+            if (rejected.length > 0) {
+                const sample = rejected.slice(0, 3).join(', ');
+                const more = rejected.length > 3 ? ` and ${rejected.length - 3} more` : '';
+                showSnackbar(`Skipped ${rejected.length} invalid/landline number(s)${more ? `: ${sample}${more}` : ''}.`, 'warning');
             }
 
-            if (rejected.length > 0) {
-                showSnackbar(`Skipped invalid/landline numbers: ${rejected.join(", ")}`, "warning");
+            // If API returned per-number results, summarize successes and failures concisely
+            if (res && res.results && Array.isArray(res.results)) {
+                const sent = res.results.filter(r => r.success).map(r => r.number);
+                const failed = res.results.filter(r => !r.success).map(r => r.number);
+
+                // Success summary: show count and small sample (not full list)
+                if (sent.length > 0) {
+                    const sample = sent.slice(0, 3).join(', ');
+                    const more = sent.length > 3 ? ` and ${sent.length - 3} more` : '';
+                    showSnackbar(`Sent to ${sent.length} number(s)${more ? `: ${sample}${more}` : '.'}`, 'success');
+                }
+
+                // Failure summary: if there are failures, show count and small sample. If nothing was sent at all, make this more prominent.
+                if (failed.length > 0) {
+                    const sample = failed.slice(0, 3).join(', ');
+                    const more = failed.length > 3 ? ` and ${failed.length - 3} more` : '';
+                    const title = sent.length === 0 ? 'Failed to send to' : 'Failed to send to';
+                    showSnackbar(`${title} ${failed.length} number(s)${more ? `: ${sample}${more}` : '.'}`, 'error');
+                }
+            } else if (res && res.success) {
+                showSnackbar('Message(s) sent successfully!', 'success');
+            } else {
+                showSnackbar('Failed to send messages!', 'error');
             }
         } catch (err) {
-            showSnackbar("Error while sending messages!", "error");
+            showSnackbar('Error while sending messages!', 'error');
         } finally {
             setLoading(false);
-            setMessage("");
+            setMessage('');
             setIsShrunk(false);
         }
     };
