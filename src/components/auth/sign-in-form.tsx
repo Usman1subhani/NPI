@@ -130,29 +130,62 @@ export function SignInForm(): React.JSX.Element {
   const handleGoogleSignIn = async (): Promise<void> => {
     setGoogleError(null);
     setIsPending(true);
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const token = await result.user.getIdToken();
 
-      // Store token and user in localStorage similar to authClient
-      localStorage.setItem('auth-token', token);
-      // Save avatar/photo if available so other components can use it
-      localStorage.setItem('user', JSON.stringify({
-        id: result.user.uid,
+    try {
+      // Step 1: Sign in with Google (Firebase)
+      const result = await signInWithPopup(auth, googleProvider);
+
+      // Step 2: Get basic user info
+      const userData = {
         name: result.user.displayName,
         email: result.user.email,
-        avatar: result.user.photoURL || result.user.providerData?.[0]?.photoURL || null,
-      }));
+      };
 
-      // Refresh auth state
-      await checkSession?.();
-      router.refresh();
+      // Step 3: Send to backend for approval check
+      const res = await fetch('http://192.168.18.110:8000/google-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await res.json();
+
+      // Step 4: Handle backend responses
+      if (data.status === 'pending') {
+        // Show snackbar or alert
+        alert('Your account is pending admin approval.');
+        return;
+      }
+
+      if (data.status === 'approved') {
+        // Step 5: Save token and user info locally
+        localStorage.setItem('auth-token', data.token);
+        localStorage.setItem(
+          'user',
+          JSON.stringify({
+            name: userData.name,
+            email: userData.email,
+            role: 'googleuser', // optional if you want to identify this role
+          })
+        );
+
+        // Step 6: Refresh session and redirect
+        await checkSession?.();
+        router.refresh();
+        router.push('/google-users'); // ✅ adjust this path to your dashboard page for approved users
+        return;
+      }
+
+      // If any other unexpected status
+      alert(data.message || 'Something went wrong. Please contact support.');
     } catch (err: any) {
+      console.error('Google Sign-In Error:', err);
       setGoogleError(err?.message || String(err));
     } finally {
       setIsPending(false);
     }
   };
+
   return (
     <Box sx={{ display: 'flex', minHeight: '50vh' }}>
       {/* Left column: form area */}

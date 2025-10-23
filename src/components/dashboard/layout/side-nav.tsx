@@ -25,6 +25,18 @@ import { useUser } from "@/hooks/use-user";
 
 export function SideNav(): React.JSX.Element {
 	const pathname = usePathname();
+	const { user } = useUser();
+
+	const role = (user?.role || '').toString().toLowerCase();
+
+	let itemsToRender = navItems;
+	if (role === 'superadmin') {
+		itemsToRender = navItems; // show all
+	} else if (role === 'admin') {
+		itemsToRender = navItems.filter(i => i.key !== 'GoogleUser');
+	} else {
+		itemsToRender = navItems.filter(i => i.key === 'Dashboard');
+	}
 
 	return (
 		<Box
@@ -79,7 +91,7 @@ export function SideNav(): React.JSX.Element {
 			</Stack>
 			<Divider sx={{ borderColor: "var(--mui-palette-neutral-700)" }} />
 			<Box component="nav" sx={{ flex: "1 1 auto", p: "12px" }}>
-				{renderNavItems({ pathname, items: navItems })}
+				{renderNavItems({ pathname, items: itemsToRender })}
 			</Box>
 			<Divider sx={{ borderColor: "var(--mui-palette-neutral-700)" }} />
 			<Stack spacing={2} sx={{ p: "12px" }}>

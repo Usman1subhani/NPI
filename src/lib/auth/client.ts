@@ -211,28 +211,56 @@ class AuthClient {
 		return { error: "Social authentication not implemented" };
 	}
 
+	// async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
+	// 	// Make API request
+	// 	try {
+	// 		const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/get-npi-data/auth/users/login`, {
+	// 			method: "POST",
+	// 			headers: {
+	// 				"Content-Type": "application/json",
+	// 			},
+	// 			body: JSON.stringify(params),
+	// 		});
+	// 		const data = await response.json();
+	// 		if (!response.ok) {
+	// 			throw new Error(data.error || "Login failed");
+	// 		}
+	// 		const token = data.user.token;
+	// 		console.log("token", token);
+	// 		localStorage.setItem("auth-token", token);
+	// 		localStorage.setItem("user", JSON.stringify(data.user));
+	// 		// Store token or perform any client-side session logic here
+	// 		// For example: localStorage.setItem('token', data.token);
+	// 	} catch (_err) {
+	// 		return { error: "Invalid credentials" };
+	// 	}
+
+	// 	return {};
+	// }
 	async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
-		// Make API request
+		// Use dummy test API for login during development
 		try {
-			const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/get-npi-data/auth/users/login`, {
+			const response = await fetch("http://192.168.18.136:4000/auth/login", {
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(params),
 			});
+
 			const data = await response.json();
 			if (!response.ok) {
-				throw new Error(data.error || "Login failed");
+				throw new Error(data.message || data.error || "Login failed");
 			}
-			const token = data.user.token;
-			console.log("token", token);
+
+			// expected shape: { message, user: { id, email, name, role, token } }
+			const token = data.user?.token;
+			if (!token) throw new Error("No token returned from auth server");
+
+			// Save auth token and full user object (including role)
 			localStorage.setItem("auth-token", token);
 			localStorage.setItem("user", JSON.stringify(data.user));
-			// Store token or perform any client-side session logic here
-			// For example: localStorage.setItem('token', data.token);
-		} catch (_err) {
-			return { error: "Invalid credentials" };
+		} catch (err) {
+			console.error("signInWithPassword error:", err);
+			return { error: String((err as Error).message || "Invalid credentials") };
 		}
 
 		return {};
@@ -353,6 +381,7 @@ class AuthClient {
 				avatar: parsedUser.avatar || parsedUser.photoURL || parsedUser.picture || null,
 				name: parsedUser.name,
 				email: parsedUser.email,
+				role: parsedUser.role,
 			},
 		};
 	}
