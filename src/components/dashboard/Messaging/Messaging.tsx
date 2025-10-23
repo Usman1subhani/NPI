@@ -39,15 +39,15 @@ export default function Messaging({ initialNumbers = [] }: { initialNumbers?: st
     }, [numbers]);
 
     //! ---------------------- Validation Functions ----------------------
-    // ✅ Format to +1xxxxxxxxxx
+    // ✅ Format to 1xxxxxxxxxx (without +)
     const formatNumber = (num: string) => {
         const digits = num.replace(/\D/g, ""); // remove all non-digits
-        if (digits.length === 10) return `+1${digits}`;
-        if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+        if (digits.length === 10) return `1${digits}`;
+        if (digits.length === 11 && digits.startsWith("1")) return digits;
         return num;
     };
-    // ✅ Validate number is U.S. mobile type
-    const isValidUSNumber = (num: string) => /^\+1\d{10}$/.test(num);
+    // ✅ Validate number is U.S. mobile type (without + prefix)
+    const isValidUSNumber = (num: string) => /^1\d{10}$/.test(num);
 
     // Example: fake landline prefixes
     const isLandline = (num: string) => {

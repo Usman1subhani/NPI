@@ -4,9 +4,11 @@ export const sendMessageAPI = async (numbers: string[], message: string) => {
   try {
     const responses = await Promise.all(
       numbers.map(async (num) => {
+        // Remove the '+' prefix if it exists and ensure clean number
+        const cleanNumber = num.replace(/^\+/, '');
+        
         const res = await fetch(
-          // `${process.env.NEXT_PRIVATE_BACKEND_URL}/ringcentral/send-sms?to=${encodeURIComponent(num)}&message=${encodeURIComponent(message)}`
-          `http://192.168.18.110:8000/ringcentral/send-sms?to=${encodeURIComponent(num)}&message=${encodeURIComponent(message)}`
+          `https://gofernets.run.place/nppes/ringcentral/send-sms?to=${cleanNumber}&message=${encodeURIComponent(message)}`
         );
 
         if (!res.ok) throw new Error(`Failed to send to ${num}`);

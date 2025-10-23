@@ -240,7 +240,7 @@ class AuthClient {
 	async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
 		// Use dummy test API for login during development
 		try {
-			const response = await fetch("http://192.168.18.136:4000/auth/login", {
+			const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/get-npi-data/auth/users/login`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(params),
