@@ -142,7 +142,7 @@ export function SignInForm(): React.JSX.Element {
       };
 
       // Step 3: Send to backend for approval check
-      const res = await fetch('http://192.168.18.110:8000/google-user', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/google-user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
