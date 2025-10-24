@@ -3,8 +3,8 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent'; 
-import {Trash, X } from '@phosphor-icons/react';
+import DialogContent from '@mui/material/DialogContent';
+import { Trash, X } from '@phosphor-icons/react';
 import Stack from '@mui/material/Stack'; // Import Stack for button layout
 
 
@@ -40,7 +40,7 @@ const DeclinePopup: React.FC<DeclinePopupProps> = ({ open, onClose, onConfirm, m
                     {message || 'Are you sure you want to Disapprove?'}
                 </Box>
                 <Box sx={{ fontSize: '14px', color: '#666', mt: 1, }}>
-                    This action does not allow this user to login as Admin again, are you sure you want to proceed?
+                    This action will prevent this user from logging in as an admin again. Are you sure you want to proceed?
                 </Box>
             </DialogContent>
             <DialogActions sx={{ padding: '25px' }}>
@@ -75,7 +75,7 @@ const DeclinePopup: React.FC<DeclinePopupProps> = ({ open, onClose, onConfirm, m
                     </Button>
                 </Stack>
             </DialogActions>
-        </Dialog>   
+        </Dialog>
     );
 };
 
