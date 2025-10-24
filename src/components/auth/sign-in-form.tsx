@@ -27,6 +27,9 @@ import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
 import { auth, googleProvider } from '@/lib/firebase';
 import { signInWithPopup } from 'firebase/auth';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert, { AlertColor } from '@mui/material/Alert';
+
 
 const schema = zod.object({
   email: zod.string().min(1, { message: 'Email is required' }).email(),
@@ -56,6 +59,26 @@ export function SignInForm(): React.JSX.Element {
   // Small uniform scale for the form to reduce size by a few pixels visually.
   const FORM_SCALE = 0.96; // tweak (0.94 - 0.98) to adjust overall size
 
+  const [snackbar, setSnackbar] = React.useState<{
+    open: boolean;
+    message: string;
+    severity: AlertColor;
+  }>({
+    open: false,
+    message: '',
+    severity: 'info',
+  });
+
+  const handleSnackbarClose = () => {
+    console.log('Closing Snackbar');
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
+  const showSnackbar = (message: string, severity: AlertColor = 'info') => {
+    const validSeverity = ['error', 'warning', 'info', 'success'].includes(severity) ? severity : 'info';
+    setSnackbar({ open: true, message, severity: validSeverity });
+  };
+
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
       setIsPending(true);
@@ -77,6 +100,8 @@ export function SignInForm(): React.JSX.Element {
     },
     [checkSession, router, setError]
   );
+
+
 
   //----------------- Google sign in logic here -----------------
   // const handleGoogleSignIn = async (): Promise<void> => {
@@ -133,6 +158,7 @@ export function SignInForm(): React.JSX.Element {
 
     try {
       // Step 1: Sign in with Google (Firebase)
+      console.log('Attempting Google Sign-In');
       const result = await signInWithPopup(auth, googleProvider);
 
       // Step 2: Get basic user info
@@ -153,7 +179,7 @@ export function SignInForm(): React.JSX.Element {
       // Step 4: Handle backend responses
       if (data.status === 'pending') {
         // Show snackbar or alert
-        alert('Cannot sign in now.\nYour account is pending for Admin approval.');
+        showSnackbar('Cannot Sign In Now.Your account is pending admin approval. Please wait.', 'warning');
         return;
       }
 
@@ -177,7 +203,7 @@ export function SignInForm(): React.JSX.Element {
 
 
       // If any other unexpected status
-      alert(data.message || 'Something went wrong. Please contact support.');
+      showSnackbar(data.message || 'Something went wrong. Please contact support.', 'error');
     } catch (err: any) {
       console.error('Google Sign-In Error:', err);
       setGoogleError(err?.message || String(err));
@@ -296,7 +322,26 @@ export function SignInForm(): React.JSX.Element {
             </Stack>
           </form>
         </Box>
+
       </Box>
+      <Snackbar
+        key={snackbar.message + snackbar.severity}
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          severity={snackbar.severity}
+          onClose={handleSnackbarClose}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </MuiAlert>
+      </Snackbar>
+
     </Box>
   );
 }
