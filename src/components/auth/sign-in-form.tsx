@@ -142,7 +142,7 @@ export function SignInForm(): React.JSX.Element {
       };
 
       // Step 3: Send to backend for approval check
-      const res = await fetch(`http://192.168.18.110:8000/google-user`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/google-user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
@@ -153,7 +153,7 @@ export function SignInForm(): React.JSX.Element {
       // Step 4: Handle backend responses
       if (data.status === 'pending') {
         // Show snackbar or alert
-        alert('Your account is pending admin approval.');
+        alert('Cannot sign in now.\nYour account is pending for Admin approval.');
         return;
       }
 

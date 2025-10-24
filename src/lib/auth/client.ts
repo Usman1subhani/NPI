@@ -209,7 +209,7 @@ class AuthClient {
 	async signInWithOAuth(_: SignInWithOAuthParams): Promise<{ error?: string }> {
 		if (_.provider === "google") {
 			try {
-				const response = await fetch(`http://192.168.18.110:8000/google-user`, {
+				const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/google-user`, {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",

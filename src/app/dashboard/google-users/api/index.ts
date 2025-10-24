@@ -57,7 +57,7 @@ export const useGoogleUsers = () => {
 
 	const disapproveUser = async (id: number) => {
 		try {
-			const res = await fetch(`http://192.168.18.110:8000/super-admin/disapprove?id=${id}`, {
+			const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/super-admin/disapprove?id=${id}`, {
 				method: "PATCH",
 			});
 			if (!res.ok) throw new Error("Failed to disapprove user");
@@ -75,7 +75,7 @@ export const useGoogleUsers = () => {
 
 	const deleteUser = async (id: number) => {
 		try {
-			const res = await fetch(`http://192.168.18.110:8000/super-admin/delete-google-user?id=${id}`, {
+			const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/super-admin/delete-google-user?id=${id}`, {
 				method: "DELETE",
 			});
 			if (!res.ok) throw new Error("Failed to delete user");

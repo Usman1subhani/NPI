@@ -24,7 +24,7 @@ export async function fetchNpiData(options: FetchNpiDataParams) {
 	const token = typeof window !== "undefined" ? localStorage.getItem("auth-token") : null;
 
 	// const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/get-npi-data`, {
-		const res = await axios.get(`http://192.168.18.110:8000/get-npi-data`, {
+		const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/get-npi-data`, {
 		params,
 		headers: token ? { Authorization: `Bearer ${token}` } : {},
 	});
