@@ -142,7 +142,7 @@ export function SignInForm(): React.JSX.Element {
       };
 
       // Step 3: Send to backend for approval check
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/google-user`, {
+      const res = await fetch(`http://192.168.18.110:8000/google-user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
@@ -157,24 +157,24 @@ export function SignInForm(): React.JSX.Element {
         return;
       }
 
-      if (data.status === 'approved') {
-        // Step 5: Save token and user info locally
+      if (data.status === 'approved' && data.token && data.user) {
         localStorage.setItem('auth-token', data.token);
-        localStorage.setItem(
-          'user',
-          JSON.stringify({
-            name: userData.name,
-            email: userData.email,
-            role: 'googleuser', // optional if you want to identify this role
-          })
-        );
+        localStorage.setItem('user', JSON.stringify(data.user));
+        console.log('Approved user data:', data);
+        console.log('token:', data.token);
 
-        // Step 6: Refresh session and redirect
         await checkSession?.();
         router.refresh();
-        router.push('/google-users'); // ✅ adjust this path to your dashboard page for approved users
+
+        // Redirect based on role
+        if (data.user.role === 'admin') {
+          router.push('/dashboard');
+        } else {
+          router.push('/google-users');
+        }
         return;
       }
+
 
       // If any other unexpected status
       alert(data.message || 'Something went wrong. Please contact support.');

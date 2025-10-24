@@ -55,5 +55,39 @@ export const useGoogleUsers = () => {
 		}
 	};
 
-	return { users, loading, error, approveUser };
+	const disapproveUser = async (id: number) => {
+		try {
+			const res = await fetch(`http://192.168.18.110:8000/super-admin/disapprove?id=${id}`, {
+				method: "PATCH",
+			});
+			if (!res.ok) throw new Error("Failed to disapprove user");
+			const updatedUser = await res.json();
+
+			// ✅ Update state correctly
+			setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, approved: false } : u)));
+
+			return updatedUser;
+		} catch (err: any) {
+			console.error(err);
+			throw err;
+		}
+	};
+
+	const deleteUser = async (id: number) => {
+		try {
+			const res = await fetch(`http://192.168.18.110:8000/super-admin/delete-google-user?id=${id}`, {
+				method: "DELETE",
+			});
+			if (!res.ok) throw new Error("Failed to delete user");
+			const updatedUser = await res.json();
+			// ✅ Update user in local state
+			setUsers((prev) => prev.filter((u) => u.id !== id));
+			return updatedUser;
+		} catch (err: any) {
+			console.error(err);
+			throw err;
+		}
+	};
+
+	return { users, loading, error, approveUser, disapproveUser, deleteUser };
 };

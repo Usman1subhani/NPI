@@ -19,15 +19,13 @@ import { CheckCircle, Trash } from "@phosphor-icons/react";
 import ConfirmationPopup from "@/components/dashboard/google-users/confirmationPopup";
 import DeletePopup from "@/components/dashboard/google-users/Delete-Popup";
 import DeclinePopup from "@/components/dashboard/google-users/Decline-Popup";
-import { useGoogleUsers } from "@/app/dashboard/google-users/api"; // 👈 import your hook
+import { useGoogleUsers } from "@/app/dashboard/google-users/api";
 
 export function PropertiesCard() {
-  const { users, loading, error, approveUser } = useGoogleUsers();
+  const { users, loading, error, approveUser, disapproveUser, deleteUser } = useGoogleUsers();
 
   const [openPopup, setOpenPopup] = React.useState(false);
-  const [popupType, setPopupType] = React.useState<
-    "confirm" | "decline" | "delete" | null
-  >(null);
+  const [popupType, setPopupType] = React.useState<"confirm" | "decline" | "delete" | null>(null);
   const [selectedUser, setSelectedUser] = React.useState<any | null>(null);
   const [userData, setUserData] = React.useState(users);
 
@@ -55,17 +53,48 @@ export function PropertiesCard() {
     setSelectedUser(null);
   };
 
+  // ✅ Approve handler
   const handleConfirm = async () => {
     if (selectedUser) {
       try {
         await approveUser(selectedUser.id);
         setUserData((prev) =>
           prev.map((u) =>
-            u.id === selectedUser.id ? { ...u, status: "Approved" } : u
+            u.id === selectedUser.id ? { ...u, approved: true } : u
           )
         );
       } catch (err) {
         console.error("Approval failed", err);
+      }
+    }
+    handleClosePopup();
+  };
+
+  // ✅ Disapprove handler
+  const handleDecline = async () => {
+    if (selectedUser) {
+      try {
+        await disapproveUser(selectedUser.id);
+        setUserData((prev) =>
+          prev.map((u) =>
+            u.id === selectedUser.id ? { ...u, approved: false } : u
+          )
+        );
+      } catch (err) {
+        console.error("Disapproval failed", err);
+      }
+    }
+    handleClosePopup();
+  };
+
+  // ✅ Delete handler
+  const handleDelete = async () => {
+    if (selectedUser) {
+      try {
+        await deleteUser(selectedUser.id);
+        setUserData((prev) => prev.filter((u) => u.id !== selectedUser.id));
+      } catch (err) {
+        console.error("Delete failed", err);
       }
     }
     handleClosePopup();
@@ -133,9 +162,7 @@ export function PropertiesCard() {
                       color:
                         user.status === "Approved"
                           ? "green"
-                          : user.status === "Pending"
-                            ? "orange"
-                            : "red",
+                          : "orange",
                       fontWeight: 600,
                     }}
                   >
@@ -144,6 +171,7 @@ export function PropertiesCard() {
                 </TableCell>
                 <TableCell align="center">
                   <Stack direction="row" justifyContent="center" spacing={1}>
+                    {/* ✅ Check icon */}
                     <IconButton
                       onClick={() =>
                         user.status === "Approved"
@@ -157,6 +185,7 @@ export function PropertiesCard() {
                       <CheckCircle size={15} />
                     </IconButton>
 
+                    {/* ✅ Delete icon */}
                     <IconButton
                       onClick={() => handleOpenPopup("delete", user)}
                       sx={{ color: "red" }}
@@ -182,12 +211,31 @@ export function PropertiesCard() {
         />
       </Box>
 
+      {/* ✅ Popups */}
       {popupType === "confirm" && (
         <ConfirmationPopup
           open={openPopup}
           onClose={handleClosePopup}
           onConfirm={handleConfirm}
           message="Are you sure you want to approve this user?"
+        />
+      )}
+
+      {popupType === "decline" && (
+        <DeclinePopup
+          open={openPopup}
+          onClose={handleClosePopup}
+          onConfirm={handleDecline}
+          message="Are you sure you want to disapprove this user?"
+        />
+      )}
+
+      {popupType === "delete" && (
+        <DeletePopup
+          open={openPopup}
+          onClose={handleClosePopup}
+          onConfirm={handleDelete}
+          message="Are you sure you want to delete this user?"
         />
       )}
     </Card>

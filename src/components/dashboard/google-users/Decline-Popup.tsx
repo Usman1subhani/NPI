@@ -37,10 +37,10 @@ const DeclinePopup: React.FC<DeclinePopupProps> = ({ open, onClose, onConfirm, m
             </Box>
             <DialogContent sx={{ textAlign: 'center', padding: '20px' }}>
                 <Box sx={{ color: 'black', fontSize: '16px', fontWeight: 'bold' }}>
-                    {message || 'Are you sure you want to Decline?'}
+                    {message || 'Are you sure you want to Disapprove?'}
                 </Box>
                 <Box sx={{ fontSize: '14px', color: '#666', mt: 1, }}>
-                    This action will decline this Rider, are you sure you want to proceed?
+                    This action does not allow this user to login as Admin again, are you sure you want to proceed?
                 </Box>
             </DialogContent>
             <DialogActions sx={{ padding: '25px' }}>
@@ -71,7 +71,7 @@ const DeclinePopup: React.FC<DeclinePopupProps> = ({ open, onClose, onConfirm, m
                             borderRadius: 20,
                         }}
                     >
-                        Yes, Decline
+                        Yes, Disapprove
                     </Button>
                 </Stack>
             </DialogActions>

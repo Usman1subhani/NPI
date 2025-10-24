@@ -36,10 +36,10 @@ const ConfirmationPopup: React.FC<ConfirmationPopupProps> = ({ open, onClose, on
             </Box>
             <DialogContent sx={{ textAlign: 'center', padding: '20px' }}>
                 <Box sx={{ color: 'black', fontSize: '16px', fontWeight: 'bold' }}>
-                    {message || 'Are you sure you want to Accept?'}
+                    {message || 'Are you sure you want to Approve?'}
                 </Box>
                 <Box sx={{ fontSize: '14px', color: '#666', mt: 1, }}>
-                    This action will add this user to system, are you sure you want to proceed?
+                    This action will allow this user to login as Admin, are you sure you want to proceed?
                 </Box>
             </DialogContent>
             <DialogActions sx={{ padding: '25px' }}>

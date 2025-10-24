@@ -40,7 +40,7 @@ const DeletePopup: React.FC<DeletePopupProps> = ({ open, onClose, onConfirm, mes
                     {message || 'Are you sure you want to Accept?'}
                 </Box>
                 <Box sx={{ fontSize: '14px', color: '#666', mt: 1, }}>
-                    This action will delete order from the system, are you sure you want to proceed?
+                    This action will delete this User from your system, are you sure you want to proceed?
                 </Box>
             </DialogContent>
             <DialogActions sx={{ padding: '25px' }}>

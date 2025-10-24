@@ -80,9 +80,7 @@ export interface ResetPasswordParams {
 }
 export interface ForgotPasswordParams {
 	email?: string;
-	
 }
-
 
 class AuthClient {
 	async signUp(_: SignUpParams): Promise<{ error?: string }> {
@@ -151,6 +149,7 @@ class AuthClient {
 
 	async signUpwithbusiness(_: SignUpBusinessParams): Promise<{ error?: string }> {
 		// Make API request
+
 		try {
 			const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/users/vendor-register`, {
 				method: "POST",
@@ -208,7 +207,44 @@ class AuthClient {
 		return {};
 	}
 	async signInWithOAuth(_: SignInWithOAuthParams): Promise<{ error?: string }> {
-		return { error: "Social authentication not implemented" };
+		if (_.provider === "google") {
+			try {
+				const response = await fetch(`http://192.168.18.110:8000/google-user`, {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				});
+				const data = await response.json();
+				if (!response.ok) {
+					throw new Error(data.message || "Google authentication failed");
+				}
+
+				// Handle the token and user data from Google sign-in response
+				const token = data.token;
+				const user = data.user;
+
+				if (!token || !user) {
+					throw new Error("Invalid response from Google authentication");
+				}
+
+				// Store token and user data in localStorage
+				localStorage.setItem("auth-token", token);
+				localStorage.setItem(
+					"user",
+					JSON.stringify({
+						...user,
+						token, // Include token in user object for consistency
+					})
+				);
+
+				return {};
+			} catch (err) {
+				console.error("Google sign-in error:", err);
+				return { error: String((err as Error).message || "Google authentication failed") };
+			}
+		}
+		return { error: "Unsupported authentication provider" };
 	}
 
 	// async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
@@ -239,6 +275,7 @@ class AuthClient {
 	// }
 	async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
 		// Use dummy test API for login during development
+		console.log("process.env.NEXT_PUBLIC_BACKEND_URL:", process.env.NEXT_PUBLIC_BACKEND_URL);
 		try {
 			const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/get-npi-data/auth/users/login`, {
 				method: "POST",
@@ -268,11 +305,14 @@ class AuthClient {
 
 	async sendForgotPasswordLink({ email }: ForgotPasswordParams): Promise<{ error?: string }> {
 		try {
-			const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/get-npi-data/auth/users/send-forgot-password-link`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ email }), // no payload needed if backend knows user email
-			});
+			const res = await fetch(
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/get-npi-data/auth/users/send-forgot-password-link`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ email }), // no payload needed if backend knows user email
+				}
+			);
 
 			if (!res.ok) {
 				const data = await res.json();
@@ -284,7 +324,13 @@ class AuthClient {
 			return { error: "Network error while sending OTP" };
 		}
 	}
-	async forgotPassword({password,resetToken}: {password: string; resetToken: string}): Promise<{ error?: string }> {
+	async forgotPassword({
+		password,
+		resetToken,
+	}: {
+		password: string;
+		resetToken: string;
+	}): Promise<{ error?: string }> {
 		try {
 			const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/get-npi-data/auth/users/forgot-password`, {
 				method: "POST",
@@ -334,8 +380,8 @@ class AuthClient {
 				const data = await res.json();
 				return { error: data.message || "Invalid OTP" };
 			}
-            const resdata = await res.json();
-            localStorage.setItem("resetToken", resdata.resetToken);
+			const resdata = await res.json();
+			localStorage.setItem("resetToken", resdata.resetToken);
 			return {};
 		} catch (err) {
 			return { error: "Network error while verifying OTP" };

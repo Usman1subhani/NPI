@@ -1,6 +1,5 @@
 "use client";
-
-const DEFAULT_ENDPOINT = 'https://gofernets.run.place/nppes';
+ 
 
 export const sendMessageAPI = async (
   numbers: string[],
@@ -10,7 +9,7 @@ export const sendMessageAPI = async (
   results?: Array<{ number: string; success: boolean; data?: any; error?: string }>;
   error?: string;
 }> => {
-  const endpoint = process.env.NEXT_PUBLIC_BACKEND_URL || DEFAULT_ENDPOINT;
+  const endpoint = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   try {
     const responses = await Promise.all(
