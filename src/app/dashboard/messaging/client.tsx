@@ -17,7 +17,7 @@ export const sendMessageAPI = async (
         const cleanNumber = num.replace(/^\+/, "");
 
         try {
-          const res = await fetch(`${endpoint}/ringcentral/send-sms`, {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/ringcentral/send-sms`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ to: cleanNumber, message }),
