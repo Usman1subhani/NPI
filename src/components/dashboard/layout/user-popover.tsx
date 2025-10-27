@@ -79,7 +79,7 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
             <GearSix size={20} weight="bold" />
           </ListItemIcon>
           <Typography variant="body2" sx={{ fontSize: 14, fontWeight: 500 }}>
-            Reset Password
+            Change Password
           </Typography>
         </MenuItem>
 
