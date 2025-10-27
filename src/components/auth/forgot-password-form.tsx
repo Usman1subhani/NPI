@@ -161,7 +161,7 @@ export function SecureForgotPasswordForm() {
 							name="email"
 							control={control}
 							render={({ field }) => (
-								<FormControl error={Boolean(errors.email)} variant="outlined" size="small">
+								<FormControl error={Boolean(errors.email)} variant="outlined">
 									<InputLabel sx={{ fontSize: '0.875rem' }}>Email *</InputLabel>
 									<OutlinedInput
 										{...field}

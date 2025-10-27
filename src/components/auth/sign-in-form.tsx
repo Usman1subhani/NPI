@@ -316,9 +316,9 @@ export function SignInForm(): React.JSX.Element {
               <Button type="submit" fullWidth disabled={isPending} variant="contained" sx={{ py: 1.5, backgroundColor: '#465FFF', fontWeight: 700, '&:hover': { backgroundColor: '#2f47d1' }, '&.Mui-disabled': { backgroundColor: 'grey.400' } }}>{isPending ? 'Signing in...' : 'Sign in'}</Button>
 
               {/* Sign Up Link */}
-              <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary' }}>Don't have an account?{' '}
+              {/* <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary' }}>Don't have an account?{' '}
                 <Link component={RouterLink} href="/auth/sign-up" sx={{ color: '#465FFF', fontWeight: 700, textDecoration: 'none', '&:hover': { color: '#2f47d1' } }}>Sign Up</Link>
-              </Typography>
+              </Typography> */}
             </Stack>
           </form>
         </Box>
