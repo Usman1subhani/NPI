@@ -13,9 +13,16 @@ import {
 	Select,
 	MenuItem,
 	Box,
+
 	Chip,
-	IconButton
+	IconButton,
+	Menu
 } from "@mui/material";
+import {
+  Dialog, DialogTitle, DialogContent, DialogActions, Checkbox, List, ListItem, ListItemText,ListItemButton
+} from "@mui/material";
+
+
 import CircularProgress from "@mui/material/CircularProgress";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -37,6 +44,12 @@ export default function NpiPage() {
 	const [loading, setLoading] = useState(false);
 	const [exporting, setExporting] = useState(false);
 	const [showFilters, setShowFilters] = useState(false);
+	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+const openMenu = Boolean(anchorEl);
+
+const [selectDialogOpen, setSelectDialogOpen] = useState(false);
+const [selectedNumbers, setSelectedNumbers] = useState<string[]>([]);
+
 	const today = new Date();
 
 	// Get the day of the week (0 = Sunday, 1 = Monday, ... 6 = Saturday)
@@ -61,6 +74,38 @@ export default function NpiPage() {
 	const [orgFilter, setOrgFilter] = useState("");
 
 	// Fetch data from backend
+const fetchAllFiltered = async () => {
+  const token = typeof window !== "undefined" ? localStorage.getItem("auth-token") : null;
+
+  const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/get-npi-data/export-csv`, {
+    params: {
+      startDate: startDate ? formatDateString(startDate) : "",
+      endDate: endDate ? formatDateString(endDate) : "",
+    },
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    responseType: "blob",
+  });
+
+  // ✅ Convert CSV blob → text
+  const csvText = await res.data.text();
+
+  // ✅ Split into rows
+  const lines = csvText.split("\n").filter(Boolean);
+  const header = lines[0].split(",");
+
+  // ✅ Find which column is "phone"
+  const phoneIndex = header.findIndex((col: any) => col.trim().toLowerCase() === "phone");
+
+  if (phoneIndex === -1) {
+    console.error("⚠️ Phone column not found in CSV.");
+    return [];
+  }
+
+  // ✅ Return list of phone numbers
+  return lines.slice(1).map((line : any) => line.split(",")[phoneIndex]?.trim()).filter(Boolean);
+};
+
+
 	const loadData = async () => {
 		setLoading(true);
 		try {
@@ -82,7 +127,7 @@ export default function NpiPage() {
 
 	// --- update useEffect to load data only if start date exists ---
 	useEffect(() => {
-		loadData(); // always load initially and on changes
+		loadData(); // always load initially and on change
 	}, [page, rowsPerPage, startDate, endDate]);
 
 
@@ -233,28 +278,113 @@ export default function NpiPage() {
 							{showFilters ? 'Hide Filters' : 'Apply Filters'}
 						</Button>
 
-						{/* ✅ New Messaging Button */}
 						<Button
-							variant="contained"
-							startIcon={<ChatCenteredText size={18} />}
-							sx={{
-								backgroundColor: '#161950',
-								minWidth: 120,
-								'&:hover': { backgroundColor: '#004080' },
-							}}
-							onClick={() => {
-								// Collect all numbers from the current filtered rows
-								const numbers = filteredRows
-									.map(r => r.phone)
-									.filter(Boolean)
-									.join(',');
+  variant="contained"
+  startIcon={<ChatCenteredText size={18} />}
+  sx={{
+    backgroundColor: '#161950',
+    minWidth: 120,
+    '&:hover': { backgroundColor: '#004080' },
+  }}
+  onClick={(e) => setAnchorEl(e.currentTarget)}
+>
+  Message
+</Button>
 
-								// Navigate to messaging page with numbers as query
-								window.location.href = `/dashboard/messaging?to=${encodeURIComponent(numbers)}`;
-							}}
-						>
-							Message
-						</Button>
+<Menu
+  anchorEl={anchorEl}
+  open={openMenu}
+  onClose={() => setAnchorEl(null)}
+>
+<MenuItem
+  onClick={async () => {
+    setAnchorEl(null);
+
+    const allPhones = await fetchAllFiltered();
+    console.log("Total phones found:", allPhones.length);
+
+    const numbers = allPhones.join(",");
+
+    window.location.href = `/dashboard/messaging?to=${encodeURIComponent(numbers)}`;
+  }}
+>
+  Message All (Filtered Data)
+</MenuItem>
+
+
+
+  <MenuItem
+    onClick={() => {
+      setAnchorEl(null);
+      const pageNumbers = filteredRows
+        .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
+        .map(r => r.phone)
+        .filter(Boolean)
+        .join(',');
+      window.location.href = `/dashboard/messaging?to=${encodeURIComponent(pageNumbers)}`;
+    }}
+  >
+    Message Current Page Only
+  </MenuItem>
+
+  <MenuItem
+    onClick={() => {
+      setAnchorEl(null);
+      setSelectDialogOpen(true);
+    }}
+  >
+    Select Specific Records
+  </MenuItem>
+</Menu>
+
+<Dialog
+  open={selectDialogOpen}
+  onClose={() => setSelectDialogOpen(false)}
+  maxWidth="sm"
+  fullWidth
+>
+  <DialogTitle>Select Numbers to Message</DialogTitle>
+  <DialogContent dividers>
+    <List>
+      {filteredRows
+        .filter(row => row.phone) // only include rows with a phone number
+        .map((row, i) => {
+          const phone = row.phone!.toString(); // safe because we filtered
+          return (
+            <ListItem key={i} disablePadding>
+              <ListItemButton
+                onClick={() => {
+                  setSelectedNumbers(prev =>
+                    prev.includes(phone)
+                      ? prev.filter(num => num !== phone)
+                      : [...prev, phone]
+                  );
+                }}
+              >
+                <Checkbox checked={selectedNumbers.includes(phone)} />
+                <ListItemText primary={phone} />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
+    </List>
+  </DialogContent>
+
+  <DialogActions>
+    <Button onClick={() => setSelectDialogOpen(false)}>Cancel</Button>
+    <Button
+      variant="contained"
+      onClick={() => {
+        const nums = selectedNumbers.join(",");
+        window.location.href = `/dashboard/messaging?to=${encodeURIComponent(nums)}`;
+      }}
+      disabled={selectedNumbers.length === 0}
+    >
+      Continue
+    </Button>
+  </DialogActions>
+</Dialog>
+
 
 						{/* Export Button */}
 						{exporting ? (

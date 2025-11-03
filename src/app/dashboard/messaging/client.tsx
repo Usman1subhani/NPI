@@ -20,7 +20,7 @@ export const sendMessageAPI = async (
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/ringcentral/send-sms`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ to: cleanNumber, message }),
+          body: JSON.stringify({ to: [cleanNumber], message }),
         });
 
         const text = await res.text().catch(() => "");
