@@ -70,15 +70,20 @@ export const sendMessageAPI = async (
   results?: Array<{ number?: string; success: boolean; data?: any; error?: string }>;
   error?: string;
 }> => {
-  // Prefer configured backend URL, fallback to known public endpoint
+  // Use the backend URL exactly as configured and append the route for the RingCentral SMS handler.
+  // Trim any trailing slash from NEXT_PUBLIC_BACKEND_URL to avoid double slashes.
   const base = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://gofernets.run.place").replace(/\/$/, "");
-  const url = `${base}/nppes/ringcentral/send-sms`;
+  const url = `${base}/ringcentral/send-sms`;
+
+  // Debug log for troubleshooting the final POST target
+  // eslint-disable-next-line no-console
+  console.log("SMS API endpoint:", url);
 
   try {
     // Clean numbers (remove leading plus signs and non-digits)
     const cleanNumbers = numbers.map((n) => n.replace(/\D/g, ""));
 
-    const res = await fetch(url, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/ringcentral/send-sms`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ to: cleanNumbers, message }),
