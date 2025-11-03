@@ -98,20 +98,23 @@ export default function Messaging({ initialNumbers = [] }: { initialNumbers?: st
         setLoading(true);
 
         try {
-            const res = await sendMessageAPI(numbers, message); // send as-is, e.g., ["8333518255"]
+                const res = await sendMessageAPI(numbers, message); // send as whole array
 
-            if (res && res.success) {
-                showSnackbar("Message(s) sent successfully!", "success");
-            } else if (res && res.results) {
-                const failed = res.results.filter(r => !r.success).map(r => r.number);
-                if (failed.length > 0) {
-                    showSnackbar(`Failed to send to ${failed.join(", ")}`, "error");
+                if (res && res.success) {
+                    // Backend accepted the batch and will process sequentially — clear UI so user can continue
+                    setNumbers([]);
+                    showSnackbar(res.message || "Message(s) sending started", "success");
+                } else if (res && res.results) {
+                    const failed = res.results.filter(r => !r.success).map(r => r.number);
+                    if (failed.length > 0) {
+                        showSnackbar(`Failed to send to ${failed.join(", ")}`, "error");
+                    } else {
+                        setNumbers([]);
+                        showSnackbar("Message(s) sent successfully!", "success");
+                    }
                 } else {
-                    showSnackbar("Message(s) sent successfully!", "success");
+                    showSnackbar(res.error || "Failed to send messages!", "error");
                 }
-            } else {
-                showSnackbar("Failed to send messages!", "error");
-            }
         } catch (err) {
             showSnackbar("Error while sending messages!", "error");
         } finally {
