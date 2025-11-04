@@ -7,6 +7,7 @@ export const sendMessageAPI = async (
   success: boolean;
   results?: Array<{ number: string; success: boolean; data?: any; error?: string }>;
   error?: string;
+  message?: string;
 }> => {
   // Helper: sleep for X ms
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
