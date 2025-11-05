@@ -92,10 +92,10 @@ export default function NpiPage() {
 		});
 
 		// ✅ Convert CSV blob → text
-		return   res.data;
+		return res.data;
 
 		// ✅ Split into rows
-		
+
 	};
 
 	const fetchAllFilteredRows = async () => {
@@ -113,7 +113,7 @@ export default function NpiPage() {
 		});
 
 		// Convert CSV blob → text
-		return   res.data;
+		return res.data;
 	};
 
 	const loadData = async () => {
@@ -368,64 +368,25 @@ export default function NpiPage() {
 									minWidth: 120,
 									"&:hover": { backgroundColor: "#004080" },
 								}}
-								onClick={(e) => setAnchorEl(e.currentTarget)}
-							>
-								Message
-							</Button>
-
-							<Menu anchorEl={anchorEl} open={openMenu} onClose={() => setAnchorEl(null)}>
-								<MenuItem
-									onClick={async () => {
-										setAnchorEl(null);
-
+								onClick={async () => {
+									try {
 										const allPhones = await fetchAllFilteredphone();
 										console.log("Total phones found:", allPhones.length);
 
 										// Save numbers in sessionStorage
-										sessionStorage.setItem("messageNumbers", JSON.stringify(allPhones.map((r:any) => r.phone).filter(Boolean)));
+										const validPhones = allPhones.map((r: any) => r.phone).filter(Boolean);
+										sessionStorage.setItem("messageNumbers", JSON.stringify(validPhones));
 
-										// Redirect with only total count
-										window.location.href = `/dashboard/messaging?total=${allPhones.map((r:any) => r.phone).filter(Boolean).length}`;
-									}}
-								>
-									Message All (Filtered Data)
-								</MenuItem>
+										// Redirect to messaging with total count
+										window.location.href = `/dashboard/messaging?total=${validPhones.length}`;
+									} catch (err) {
+										console.error("Error fetching phones:", err);
+									}
+								}}
+							>
+								Send Message
+							</Button>
 
-								<MenuItem
-									onClick={() => {
-										setAnchorEl(null);
-										// Message Current Page Only
-										const pageNumbers = filteredRows
-											.slice(page * rowsPerPage, (page + 1) * rowsPerPage)
-											.map((r) => r.phone)
-											.filter(Boolean)
-											.map((num: string | undefined) => {
-												if (num === undefined) {
-													return "";
-												}
-												return num.replace(/\D/g, "");
-											})
-											.filter((num: string, index: number, self: string[]) => {
-												return num.length >= 10 && !isLandline(num) && self.indexOf(num) === index;
-											});
-
-										sessionStorage.setItem("messageNumbers", JSON.stringify(pageNumbers));
-										window.location.href = `/dashboard/messaging?total=${pageNumbers.length}`;
-									}}
-								>
-									Message Current Page Only
-								</MenuItem>
-
-								<MenuItem
-									onClick={() => {
-										setAnchorEl(null);
-										setSelectDialogOpen(true);
-										setSelectedNumbers([]); // clear previous selections
-									}}
-								>
-									Select Specific Records
-								</MenuItem>
-							</Menu>
 
 							<Dialog open={selectDialogOpen} onClose={() => setSelectDialogOpen(false)} maxWidth="sm" fullWidth>
 								<DialogTitle>Select Numbers to Message</DialogTitle>
