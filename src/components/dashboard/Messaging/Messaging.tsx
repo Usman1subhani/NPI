@@ -17,6 +17,7 @@ import {
 import MuiAlert, { AlertColor } from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import { PaperPlaneTilt, X } from "@phosphor-icons/react";
+import { any } from "zod";
 
 export default function Messaging({ initialNumbers }: { initialNumbers: string[] }) {
 	// keep raw numbers normalized in state (format to API-accepted '1XXXXXXXXXX')
@@ -26,6 +27,7 @@ export default function Messaging({ initialNumbers }: { initialNumbers: string[]
 	const [isShrunk, setIsShrunk] = useState(false); // shrink "To" section when composing
 	const toBoxRef = useRef<HTMLDivElement>(null);
 	const [loading, setLoading] = useState(false);
+	const [displayNumbers, setDisplayNumbers] = useState<string[]>([]);
 
 	const [snackbar, setSnackbar] = useState<{
 		open: boolean;
@@ -52,10 +54,11 @@ export default function Messaging({ initialNumbers }: { initialNumbers: string[]
     }
 }, []);
 
+// decalre empty array any type
 
 	// Inside your component
-	const displayNumbers = numbers.length > 50 ? numbers.slice(0, 50) : numbers;
-	const remainingCount = numbers.length - displayNumbers.length;
+	const remainingCount = numbers.length
+	//  - displayNumbers.length;
 
 	//! ---------------------- Validation Functions ----------------------
 	// ✅ Format to xxxxxxxxxx (without +)
@@ -76,12 +79,15 @@ export default function Messaging({ initialNumbers }: { initialNumbers: string[]
 		if (e.key === "Enter" && inputValue.trim() !== "") {
 			e.preventDefault();
 			const formatted = formatNumber(inputValue.trim());
-			if (!numbers.includes(formatted) && !isLandline(formatted)) setNumbers([...numbers, formatted]);
+			if (!numbers.includes(formatted) && !isLandline(formatted)){ 
+				setDisplayNumbers(displayNumbers.concat(formatted));
+				setNumbers([...numbers, formatted]);}
 			setInputValue("");
 		}
 	};
 	const handleRemoveNumber = (num: string) => {
 		setNumbers(numbers.filter((n) => n !== num));
+		setDisplayNumbers(displayNumbers.filter((n) => n !== num));
 	};
 
 	//! ---------------------- Sending Messages ----------------------
@@ -187,14 +193,14 @@ export default function Messaging({ initialNumbers }: { initialNumbers: string[]
 
 						{remainingCount > 0 && (
 							<Chip
-								label={`+ ${remainingCount} more`}
-								sx={{ backgroundColor: "#666", color: "white", fontSize: 12, height: 28 }}
+								label={`${remainingCount} Phone Numbers Selected`}
+								sx={{ backgroundColor: "green", color: "white", fontSize: 12, height: 28 }}
 							/>
 						)}
 
 						{/* Input Field */}
 						<TextField
-							placeholder="Type number & press Enter"
+							placeholder="Add More Numbers & Enter to add"
 							variant="standard"
 							value={inputValue}
 							onChange={(e) => setInputValue(e.target.value)}

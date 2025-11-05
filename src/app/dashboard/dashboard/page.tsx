@@ -80,75 +80,40 @@ export default function NpiPage() {
 	const fetchAllFilteredphone = async () => {
 		const token = typeof window !== "undefined" ? localStorage.getItem("auth-token") : null;
 
-		const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/get-npi-data/export-csv`, {
+		const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/get-npi-data/filter-data`, {
 			params: {
 				startDate: startDate ? formatDateString(startDate) : "",
 				endDate: endDate ? formatDateString(endDate) : "",
+				state: stateFilter,
+				city: cityFilter,
+				organization: orgFilter,
 			},
 			headers: token ? { Authorization: `Bearer ${token}` } : {},
-			responseType: "blob",
 		});
 
 		// ✅ Convert CSV blob → text
-		const csvText = await res.data.text();
+		return   res.data;
 
 		// ✅ Split into rows
-		const lines = csvText.split("\n").filter(Boolean);
-		const header = lines[0].split(",");
-
-		// ✅ Find which column is "phone"
-		const phoneIndex = header.findIndex((col: any) => col.trim().toLowerCase() === "phone");
-
-		if (phoneIndex === -1) {
-			console.error("⚠️ Phone column not found in CSV.");
-			return [];
-		}
-
-		// ✅ Return list of phone numbers
-		return lines
-			.slice(1)
-			.map((line: any) => line.split(",")[phoneIndex]?.trim())
-			.filter(Boolean)
-			.map((num: string | undefined) => {
-				if (num === undefined) {
-					return "";
-				}
-				return num.replace(/\D/g, "");
-			})
-			.filter((num: string, index: number, self: string[]) => {
-				return num.length >= 10 && !isLandline(num) && self.indexOf(num) === index;
-			});
+		
 	};
 
 	const fetchAllFilteredRows = async () => {
 		const token = typeof window !== "undefined" ? localStorage.getItem("auth-token") : null;
 
-		const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/get-npi-data/export-csv`, {
+		const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/get-npi-data/filter-data`, {
 			params: {
 				startDate: startDate ? formatDateString(startDate) : "",
 				endDate: endDate ? formatDateString(endDate) : "",
+				state: stateFilter,
+				city: cityFilter,
+				organization: orgFilter,
 			},
 			headers: token ? { Authorization: `Bearer ${token}` } : {},
-			responseType: "blob",
 		});
 
 		// Convert CSV blob → text
-		const csvText = await res.data.text();
-
-		const lines = csvText.split("\n").filter(Boolean);
-		const header = lines[0].split(",");
-
-		// Map CSV rows → objects
-		const rows = lines.slice(1).map((line: any) => {
-			const values = line.split(",");
-			const obj: any = {};
-			header.forEach((h: any, i: any) => {
-				obj[h.trim()] = values[i]?.trim();
-			});
-			return obj;
-		});
-
-		return rows;
+		return   res.data;
 	};
 
 	const loadData = async () => {
@@ -417,10 +382,10 @@ export default function NpiPage() {
 										console.log("Total phones found:", allPhones.length);
 
 										// Save numbers in sessionStorage
-										sessionStorage.setItem("messageNumbers", JSON.stringify(allPhones));
+										sessionStorage.setItem("messageNumbers", JSON.stringify(allPhones.map((r) => r.phone).filter(Boolean)));
 
 										// Redirect with only total count
-										window.location.href = `/dashboard/messaging?total=${allPhones.length}`;
+										window.location.href = `/dashboard/messaging?total=${allPhones.map((r) => r.phone).filter(Boolean).length}`;
 									}}
 								>
 									Message All (Filtered Data)
