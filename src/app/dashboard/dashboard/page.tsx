@@ -176,7 +176,7 @@ export default function NpiPage() {
 	// --- update useEffect to load data only if start date exists ---
 	useEffect(() => {
 		loadData(); // always load initially and on change
-	}, [page, rowsPerPage, startDate, endDate, stateFilter, cityFilter, orgFilter]);
+	}, [page, rowsPerPage, startDate, endDate, stateFilter, cityFilter, orgFilter, searchTerm]);
 
 	// --- update loadData() to skip when no start date selected ---
 
