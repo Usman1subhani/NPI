@@ -382,10 +382,10 @@ export default function NpiPage() {
 										console.log("Total phones found:", allPhones.length);
 
 										// Save numbers in sessionStorage
-										sessionStorage.setItem("messageNumbers", JSON.stringify(allPhones.map((r) => r.phone).filter(Boolean)));
+										sessionStorage.setItem("messageNumbers", JSON.stringify(allPhones.map((r:any) => r.phone).filter(Boolean)));
 
 										// Redirect with only total count
-										window.location.href = `/dashboard/messaging?total=${allPhones.map((r) => r.phone).filter(Boolean).length}`;
+										window.location.href = `/dashboard/messaging?total=${allPhones.map((r:any) => r.phone).filter(Boolean).length}`;
 									}}
 								>
 									Message All (Filtered Data)
