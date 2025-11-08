@@ -21,7 +21,7 @@ import { any } from "zod";
 
 export default function Messaging({ initialNumbers }: { initialNumbers: string[] }) {
 	// keep raw numbers normalized in state (format to API-accepted '1XXXXXXXXXX')
-	const [numbers, setNumbers] = useState<string[]>([]);
+	const [numbers, setNumbers] = useState<any[]>([]);
 	const [inputValue, setInputValue] = useState("");
 	const [message, setMessage] = useState("");
 	const [isShrunk, setIsShrunk] = useState(false); // shrink "To" section when composing
@@ -47,9 +47,11 @@ export default function Messaging({ initialNumbers }: { initialNumbers: string[]
 	useEffect(() => {
     const stored = sessionStorage.getItem("messageNumbers");
     if (stored) {
-        const storedNumbers: string[] = JSON.parse(stored);
+        const storedNumbers: any[] = JSON.parse(stored);
+		console.log(storedNumbers[0]['phone']);
+		
         const formattedNumbers = storedNumbers
-            .map((num) => num.replace(/\D/g, "")) // digits only
+            .map((num) => ({phone:num['phone'].toString(),npi:num.npi})) // digits only
         setNumbers(formattedNumbers);
     }
 }, []);
@@ -65,6 +67,7 @@ export default function Messaging({ initialNumbers }: { initialNumbers: string[]
 	const formatNumber = (num: string) => {
 		return num.replace(/\D/g, ""); // remove dashes, brackets, spaces, etc.
 	};
+	
 
 	// Example: fake landline prefixes
 	const isLandline = (num: string) => {
@@ -79,14 +82,14 @@ export default function Messaging({ initialNumbers }: { initialNumbers: string[]
 		if (e.key === "Enter" && inputValue.trim() !== "") {
 			e.preventDefault();
 			const formatted = formatNumber(inputValue.trim());
-			if (!numbers.includes(formatted) && !isLandline(formatted)){ 
+			if (!numbers.filter((n) => n.phone === formatted).length && !isLandline(formatted)){ 
 				setDisplayNumbers(displayNumbers.concat(formatted));
-				setNumbers([...numbers, formatted]);}
+				setNumbers([...numbers, {phone:formatted}]);}
 			setInputValue("");
 		}
 	};
 	const handleRemoveNumber = (num: string) => {
-		setNumbers(numbers.filter((n) => n !== num));
+		setNumbers(numbers.filter((n) => n.phone !== num));
 		setDisplayNumbers(displayNumbers.filter((n) => n !== num));
 	};
 

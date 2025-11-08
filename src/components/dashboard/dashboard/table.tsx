@@ -42,6 +42,7 @@ export interface NpiRegistry {
 	createdAt?: string | Date;
 	updatedAt?: string | Date;
 	enumerationDate?: string | Date;
+	messageSent?: boolean;
 }
 
 interface DashboardTableProps {
@@ -137,6 +138,7 @@ export function DashboardTable({
 								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Created At</TableCell>
 								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Updated At</TableCell>
 								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Enumeration Date</TableCell>
+								<TableCell sx={{ backgroundColor: '#161950', color: 'white', fontSize: 13, fontWeight: 700, py: 1, whiteSpace: 'nowrap' }}>Status</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
@@ -199,6 +201,7 @@ export function DashboardTable({
 										<TableCell sx={{ fontSize: 12 }}>{new Date(row.createdAt ?? "--").toLocaleDateString()}</TableCell>
 										<TableCell sx={{ fontSize: 12 }}>{new Date(row.updatedAt ?? "--").toLocaleDateString()}</TableCell>
 										<TableCell sx={{ fontSize: 12 }}>{new Date(row.enumerationDate ?? "--").toLocaleDateString()}</TableCell>
+										<TableCell sx={{ fontSize: 12 }}>{row.messageSent? "Sent":  "-"}</TableCell>
 									</TableRow>
 								))
 							) : (
