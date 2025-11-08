@@ -90,12 +90,9 @@ export default function NpiPage() {
 			},
 			headers: token ? { Authorization: `Bearer ${token}` } : {},
 		});
-
-		// ✅ Convert CSV blob → text
 		return res.data;
 
 		// ✅ Split into rows
-
 	};
 
 	const fetchAllFilteredRows = async () => {
@@ -372,13 +369,16 @@ export default function NpiPage() {
 									try {
 										const allPhones = await fetchAllFilteredphone();
 										console.log("Total phones found:", allPhones.length);
-
 										// Save numbers in sessionStorage
-										const validPhones = allPhones.map((r: any) => r.phone).filter(Boolean);
+										const validPhones = allPhones.filter((r: any) => r.messageSent != true).map((r: any) => ({phone:r.phone,npi:r.npi})).filter((r: any) => r.phone != null);
 										sessionStorage.setItem("messageNumbers", JSON.stringify(validPhones));
-
-										// Redirect to messaging with total count
+										if(validPhones.length == 0){
+											alert("No valid phone numbers found to send message.");
+										}else{
 										window.location.href = `/dashboard/messaging?total=${validPhones.length}`;
+
+										}
+										// Redirect to messaging with total count
 									} catch (err) {
 										console.error("Error fetching phones:", err);
 									}
@@ -386,7 +386,6 @@ export default function NpiPage() {
 							>
 								Send Message
 							</Button>
-
 
 							<Dialog open={selectDialogOpen} onClose={() => setSelectDialogOpen(false)} maxWidth="sm" fullWidth>
 								<DialogTitle>Select Numbers to Message</DialogTitle>

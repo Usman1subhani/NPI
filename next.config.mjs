@@ -2,7 +2,7 @@
 const config = {
   reactStrictMode: false, // 👈 Disable Strict Mode
   env: {
-    NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL || 'https://gofernets.run.place/nppes',
+    NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000',
   },
   // Optimize build output
   compress: true,
