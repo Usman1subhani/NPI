@@ -16,6 +16,7 @@ import {
 	TableHead,
 	TablePagination,
 	TableRow,
+    Typography,
 } from "@mui/material";
 
 export default function SessionsTable() {
@@ -93,11 +94,11 @@ export default function SessionsTable() {
 						<TableHead>
 							<TableRow>
 								<TableCell>#</TableCell>
-								<TableCell sx={{textWrap:'nowrap'}}>Campaign ID</TableCell>
+								<TableCell sx={{ textWrap: "nowrap" }}>Campaign ID</TableCell>
 								<TableCell>Status</TableCell>
 								<TableCell>Message</TableCell>
-								<TableCell sx={{textWrap:'nowrap'}}>Created At</TableCell>
-								<TableCell sx={{textWrap:'nowrap'}}>Total Phones</TableCell>
+								<TableCell sx={{ textWrap: "nowrap" }}>Created At</TableCell>
+								<TableCell sx={{ textWrap: "nowrap" }}>Total Phones</TableCell>
 								<TableCell>Sent</TableCell>
 								<TableCell>Pending</TableCell>
 								<TableCell>Actions</TableCell>
@@ -115,17 +116,31 @@ export default function SessionsTable() {
 										<TableCell>{session.id}</TableCell>
 										<TableCell>{session.status}</TableCell>
 										<TableCell>{session.message || "-"}</TableCell>
-										<TableCell sx={{textWrap:'nowrap'}}>{new Date(session.createdAt).toLocaleString()}</TableCell>
+										<TableCell sx={{ textWrap: "nowrap" }}>{new Date(session.createdAt).toLocaleString()}</TableCell>
 										<TableCell>{totalPhones}</TableCell>
 										<TableCell>{sentCount}</TableCell>
 										<TableCell>{pendingCount}</TableCell>
 										<TableCell sx={{ display: "flex", alignItems: "center", gap: "3px" }}>
-											<Button variant="outlined" sx={{ width: 50 }} onClick={() => handleStop(session.id)}>
-												Stop
-											</Button>
-											<Button variant="outlined" sx={{ width: 50 }} onClick={() => handleResume(session.id)}>
-												Resume
-											</Button>
+											{session.status === "running" && (
+												<>
+													<Button variant="outlined" sx={{ width: 50 }} onClick={() => handleStop(session.id)}>
+														Stop
+													</Button>
+													<Button variant="outlined" sx={{ width: 50 }} onClick={() => handleResume(session.id)}>
+														Resume
+													</Button>
+												</>
+											)}
+											{session.status === "stopped" && (
+												<Button variant="outlined" sx={{ width: 50 }} onClick={() => handleResume(session.id)}>
+													Resume
+												</Button>
+											)}
+											{session.status === "completed" && (
+												<Typography variant="body2" color="success.main" sx={{ fontWeight: 600 }}>
+													Completed
+												</Typography>
+											)}
 										</TableCell>
 									</TableRow>
 								);

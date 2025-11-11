@@ -201,9 +201,6 @@ export default function MessagingDialog({
 						</Stack>
 					</Card>
 				</DialogContent>
-				<DialogActions>
-					<Button onClick={() => setOpen(false)}>Close</Button>
-				</DialogActions>
 			</Dialog>
 			<Snackbar
 				open={snackbar.open}
