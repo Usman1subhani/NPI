@@ -37,6 +37,7 @@ import toast from "react-hot-toast";
 
 import { Loader } from "@/components/core/loader";
 import { DashboardTable, NpiRegistry } from "@/components/dashboard/dashboard/table";
+import MessagingDialog from "@/components/dashboard/Messaging/MessagingDialog";
 
 import { fetchNpiData } from "../../../lib/npi";
 
@@ -49,10 +50,11 @@ export default function NpiPage() {
 	const [exporting, setExporting] = useState(false);
 	const [showFilters, setShowFilters] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+	// const [displayNumbers, setDisplayNumbers] = useState<string[]>([]);
+	const [numbers, setNumbers] = useState<any[]>([]);
 	const openMenu = Boolean(anchorEl);
 
 	const [selectDialogOpen, setSelectDialogOpen] = useState(false);
-	const [selectedNumbers, setSelectedNumbers] = useState<string[]>([]);
 
 	const today = new Date();
 
@@ -370,15 +372,18 @@ export default function NpiPage() {
 										const allPhones = await fetchAllFilteredphone();
 										console.log("Total phones found:", allPhones.length);
 										// Save numbers in sessionStorage
-										const validPhones = allPhones.filter((r: any) => r.messageSent != true).map((r: any) => ({phone:r.phone,npi:r.npi})).filter((r: any) => r.phone != null);
+										const validPhones = allPhones
+											.filter((r: any) => r.messageSent != true)
+											.map((r: any) => ({ phone: r.phone, npi: r.npi }))
+											.filter((r: any) => r.phone != null);
 										sessionStorage.setItem("messageNumbers", JSON.stringify(validPhones));
-										if(validPhones.length == 0){
-											alert("No valid phone numbers found to send message.");
-										}else{
-										window.location.href = `/dashboard/messaging?total=${validPhones.length}`;
-
+										if (validPhones.length == 0) {
+											toast.error("Message already sent to these numbers.");
+											return;
 										}
-										// Redirect to messaging with total count
+										setNumbers(validPhones);
+										// setDisplayNumbers(validPhones.map((n: any) => n.phone));
+										setSelectDialogOpen(true); // opens dialog
 									} catch (err) {
 										console.error("Error fetching phones:", err);
 									}
@@ -386,58 +391,6 @@ export default function NpiPage() {
 							>
 								Send Message
 							</Button>
-
-							<Dialog open={selectDialogOpen} onClose={() => setSelectDialogOpen(false)} maxWidth="sm" fullWidth>
-								<DialogTitle>Select Numbers to Message</DialogTitle>
-								<DialogContent dividers>
-									<List>
-										{filteredRows
-											.filter((row) => row.phone) // only include rows with a phone number
-											.map((row, i) => {
-												const phone = row.phone!.toString().replace(/\D/g, ""); // remove dashes, spaces, etc.
-
-												// Skip landlines, invalid numbers, or duplicates
-												if (isLandline(phone) || phone.length < 10 || seen.has(phone)) return null;
-
-												seen.add(phone); // mark as seen
-
-												if (isLandline(phone) || phone.length < 10 || phone.indexOf(phone)) return null; // skip landlines
-												return (
-													<ListItem key={i} disablePadding>
-														<ListItemButton
-															onClick={() => {
-																setSelectedNumbers((prev) =>
-																	prev.includes(phone) ? prev.filter((num) => num !== phone) : [...prev, phone]
-																);
-															}}
-														>
-															<Checkbox checked={selectedNumbers.includes(phone)} />
-															<ListItemText primary={phone} />
-														</ListItemButton>
-													</ListItem>
-												);
-											})
-											.filter(Boolean)}
-									</List>
-								</DialogContent>
-
-								<DialogActions>
-									<Button onClick={() => setSelectDialogOpen(false)}>Cancel</Button>
-									<Button
-										variant="contained"
-										onClick={() => {
-											// Save selected numbers to sessionStorage
-											sessionStorage.setItem("messageNumbers", JSON.stringify(selectedNumbers));
-
-											// Redirect with total count
-											window.location.href = `/dashboard/messaging?total=${selectedNumbers.length}`;
-										}}
-										disabled={selectedNumbers.length === 0}
-									>
-										Continue ({selectedNumbers.length})
-									</Button>
-								</DialogActions>
-							</Dialog>
 
 							{/* Export Button */}
 							{exporting ? (
@@ -587,6 +540,14 @@ export default function NpiPage() {
 						</Box>
 					)}
 				</Card>
+				<MessagingDialog
+					open={selectDialogOpen}
+					setOpen={setSelectDialogOpen}
+					numbers={numbers}
+					setNumbers={setNumbers}
+					// displayNumbers={displayNumbers}
+					// setDisplayNumbers={setDisplayNumbers}
+				/>
 
 				{/* Table */}
 				{loading ? (
