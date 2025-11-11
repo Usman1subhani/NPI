@@ -123,16 +123,16 @@ export default function SessionsTable() {
 										<TableCell sx={{ display: "flex", alignItems: "center", gap: "3px" }}>
 											{session.status === "running" && (
 												<>
-													<Button variant="outlined" sx={{ width: 'fit-content',padding:'10px 10px 10px 10px' }} onClick={() => handleStop(session.id)}>
+													<Button variant="outlined" sx={{ width: 'fit-content',padding:'10px 10px 10px 10px',lineHeight:1 }} onClick={() => handleStop(session.id)}>
 														Stop
 													</Button>
-													<Button variant="outlined" sx={{ width: 'fit-content',padding:'10px 10px 10px 10px' }} onClick={() => handleResume(session.id)}>
+													<Button variant="outlined" sx={{ width: 'fit-content',padding:'10px 10px 10px 10px',lineHeight:1 }} onClick={() => handleResume(session.id)}>
 														Resume
 													</Button>
 												</>
 											)}
 											{session.status === "stopped" && (
-												<Button variant="outlined" sx={{ width:"fit-content",padding:'10px 10px 10px 10px' }} onClick={() => handleResume(session.id)}>
+												<Button variant="outlined" sx={{ width:"fit-content",padding:'10px 10px 10px 10px',lineHeight:1 }} onClick={() => handleResume(session.id)}>
 													Resume
 												</Button>
 											)}
